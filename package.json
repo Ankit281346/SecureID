@@ -1,0 +1,36 @@
+{
+  "name": "truly-ias-iam-part1",
+  "version": "1.0.0",
+  "description": "IAM Authentication & Registration — Part 1 (Registration, Email OTP, SMS OTP, MFA)",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js",
+    "prisma:generate": "prisma generate",
+    "prisma:push": "prisma db push",
+    "prisma:studio": "prisma studio",
+    "test": "node tests/registrationFlow.test.js"
+  },
+  "keywords": [
+    "iam",
+    "auth",
+    "registration",
+    "otp",
+    "mfa",
+    "express",
+    "prisma"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9",
+    "prisma": "^5.22.0"
+  }
+}
