@@ -6,8 +6,8 @@
   "scripts": {
     "start": "node backend/server.js",
     "dev": "nodemon backend/server.js",
-    "postinstall": "prisma generate",
-    "vercel-build": "prisma generate && prisma db push",
+    "postinstall": "DATABASE_URL=\"file:./dev.db\" prisma generate",
+    "vercel-build": "DATABASE_URL=\"file:./dev.db\" prisma generate && DATABASE_URL=\"file:./dev.db\" prisma db push --accept-data-loss",
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push",
     "prisma:studio": "prisma studio",

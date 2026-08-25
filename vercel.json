@@ -1,6 +1,14 @@
 {
   "version": 2,
-  "buildCommand": "prisma generate && prisma db push",
+  "build": {
+    "env": {
+      "DATABASE_URL": "file:./dev.db"
+    }
+  },
+  "env": {
+    "DATABASE_URL": "file:./dev.db"
+  },
+  "buildCommand": "DATABASE_URL=\"file:./dev.db\" prisma generate && DATABASE_URL=\"file:./dev.db\" prisma db push --accept-data-loss",
   "builds": [
     {
       "src": "api/index.js",
