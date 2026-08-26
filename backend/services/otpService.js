@@ -5,7 +5,7 @@ const { hashOtp, verifyOtpHash } = require('../utils/hashing');
 const OTP_EXPIRY_MS = 5 * 60 * 1000; // 5 minutes
 const MAX_ATTEMPTS = 5;
 
-// In-memory store for development / test retrieval only
+// In-memory store for development / demonstration retrieval
 const devOtpStore = new Map();
 
 /**
@@ -72,16 +72,14 @@ async function createOtpChallenge({ userId, channel, recipient, purpose = 'regis
     }
   });
 
-  // Store plaintext in memory strictly for dev/test retrieval
-  if (process.env.NODE_ENV !== 'production') {
-    devOtpStore.set(challenge.id, {
-      challengeId: challenge.id,
-      channel,
-      purpose,
-      otp,
-      expiresAt: expiresAt.toISOString()
-    });
-  }
+  // Store in simulation store for demo & testing retrieval
+  devOtpStore.set(challenge.id, {
+    challengeId: challenge.id,
+    channel,
+    purpose,
+    otp,
+    expiresAt: expiresAt.toISOString()
+  });
 
   // Print simulated delivery to server console
   logSimulatedDelivery(channel, recipient, otp, purpose);
@@ -185,7 +183,7 @@ async function verifyOtpChallenge({ challengeId, otp, expectedPurpose }) {
     include: { user: true }
   });
 
-  // Clean up in-memory dev store
+  // Clean up in-memory simulation store
   devOtpStore.delete(challenge.id);
 
   return {
@@ -195,14 +193,11 @@ async function verifyOtpChallenge({ challengeId, otp, expectedPurpose }) {
 }
 
 /**
- * Retrieve test OTP in development mode
+ * Retrieve test OTP in simulation mode
  * @param {string} challengeId
  * @returns {Object|null}
  */
 function getDevOtp(challengeId) {
-  if (process.env.NODE_ENV === 'production') {
-    return null;
-  }
   return devOtpStore.get(challengeId) || null;
 }
 

@@ -272,13 +272,19 @@ class RegistrationFlow {
 
   async updateDevPanel() {
     const codeEl = document.getElementById('dev-otp-code');
-    if (!codeEl || !this.state.challengeId) return;
+    const emailChipVal = document.getElementById('reg-email-sim-val');
+    const smsChipVal = document.getElementById('reg-sms-sim-val');
+    if (!this.state.challengeId) return;
 
     const data = await window.api.getDevOtp(this.state.challengeId);
     if (data && data.otp) {
-      codeEl.textContent = data.otp;
+      if (codeEl) codeEl.textContent = data.otp;
+      if (emailChipVal) emailChipVal.textContent = data.otp;
+      if (smsChipVal) smsChipVal.textContent = data.otp;
     } else {
-      codeEl.textContent = '— — — — — —';
+      if (codeEl) codeEl.textContent = '— — — — — —';
+      if (emailChipVal) emailChipVal.textContent = 'Check Terminal Logs';
+      if (smsChipVal) smsChipVal.textContent = 'Check Terminal Logs';
     }
   }
 

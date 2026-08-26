@@ -729,6 +729,46 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  const autofillActiveGrid = (otp) => {
+    if (!otp) return;
+    const currentActive = document.querySelector('.screen-view.active');
+    let gridId = 'login-mfa-otp-grid';
+    if (currentActive && currentActive.id === 'screen-email-otp') gridId = 'email-otp-grid';
+    else if (currentActive && currentActive.id === 'screen-sms-otp') gridId = 'sms-otp-grid';
+
+    const container = document.getElementById(gridId);
+    if (container) {
+      const inputs = container.querySelectorAll('.box-digit');
+      otp.split('').forEach((d, i) => {
+        if (inputs[i]) inputs[i].value = d;
+      });
+      if (inputs[5]) inputs[5].focus();
+    }
+  };
+
+  const handleChipClick = async (challengeId) => {
+    if (!challengeId) return;
+    const data = await api.getDevOtp(challengeId);
+    if (data && data.otp) {
+      autofillActiveGrid(data.otp);
+    }
+  };
+
+  const btnAutofillLoginChip = document.getElementById('btn-autofill-login-chip');
+  const btnAutofillEmailChip = document.getElementById('btn-autofill-email-chip');
+  const btnAutofillSmsChip = document.getElementById('btn-autofill-sms-chip');
+  const btnAutofillForgotChip = document.getElementById('btn-autofill-forgot-chip');
+
+  if (btnAutofillLoginChip) btnAutofillLoginChip.addEventListener('click', () => handleChipClick(authFlow.state.challengeId));
+  if (btnAutofillEmailChip) btnAutofillEmailChip.addEventListener('click', () => handleChipClick(flow.state.challengeId));
+  if (btnAutofillSmsChip) btnAutofillSmsChip.addEventListener('click', () => handleChipClick(flow.state.challengeId));
+  if (btnAutofillForgotChip) btnAutofillForgotChip.addEventListener('click', async () => {
+    if (activeResetChallengeId) {
+      const data = await api.getDevOtp(activeResetChallengeId);
+      if (data && data.otp && forgotOtpInput) forgotOtpInput.value = data.otp;
+    }
+  });
+
   if (btnAutofillOtp) {
     btnAutofillOtp.addEventListener('click', async () => {
       const challengeId = activeResetChallengeId || authFlow.state.challengeId || flow.state.challengeId;
@@ -739,19 +779,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           if (forgotOtpInput) forgotOtpInput.value = data.otp;
           return;
         }
-
-        let gridId = 'login-mfa-otp-grid';
-        if (flow.state.currentStep === 'screen-email-otp') gridId = 'email-otp-grid';
-        else if (flow.state.currentStep === 'screen-sms-otp') gridId = 'sms-otp-grid';
-
-        const container = document.getElementById(gridId);
-        if (container) {
-          const inputs = container.querySelectorAll('.box-digit');
-          data.otp.split('').forEach((d, i) => {
-            if (inputs[i]) inputs[i].value = d;
-          });
-          if (inputs[5]) inputs[5].focus();
-        }
+        autofillActiveGrid(data.otp);
       }
     });
   }

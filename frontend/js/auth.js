@@ -298,13 +298,16 @@ class AuthFlow {
 
   async updateDevPanel() {
     const codeEl = document.getElementById('dev-otp-code');
-    if (!codeEl || !this.state.challengeId) return;
+    const loginChipVal = document.getElementById('login-sim-val');
+    if (!this.state.challengeId) return;
 
     const data = await window.api.getDevOtp(this.state.challengeId);
     if (data && data.otp) {
-      codeEl.textContent = data.otp;
+      if (codeEl) codeEl.textContent = data.otp;
+      if (loginChipVal) loginChipVal.textContent = data.otp;
     } else {
-      codeEl.textContent = '— — — — — —';
+      if (codeEl) codeEl.textContent = '— — — — — —';
+      if (loginChipVal) loginChipVal.textContent = 'Check Terminal Logs';
     }
   }
 

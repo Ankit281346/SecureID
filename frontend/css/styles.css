@@ -657,6 +657,43 @@ body {
   color: var(--text-dark);
 }
 
+.simulated-otp-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e40af;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  margin-bottom: 1.25rem;
+}
+
+.simulated-otp-chip strong {
+  font-family: monospace;
+  font-size: 0.95rem;
+  letter-spacing: 0.1em;
+  color: #1d4ed8;
+}
+
+.btn-chip-autofill {
+  background-color: #1d4ed8;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-chip-autofill:hover {
+  background-color: #1e40af;
+}
+
 .otp-boxes-grid {
   display: flex;
   justify-content: center;

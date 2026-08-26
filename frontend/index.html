@@ -212,6 +212,12 @@
             </p>
           </div>
 
+          <!-- Simulated OTP Notification Chip -->
+          <div class="simulated-otp-chip" id="login-mfa-sim-chip">
+            <span>💡 Simulated Code: <strong class="sim-otp-val" id="login-sim-val">Loading...</strong></span>
+            <button type="button" class="btn-chip-autofill" id="btn-autofill-login-chip">Auto-fill</button>
+          </div>
+
           <!-- 6-digit OTP Box Inputs -->
           <div class="otp-boxes-grid" id="login-mfa-otp-grid">
             <input type="text" class="box-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
@@ -360,6 +366,13 @@
               We have sent a 6-digit code to<br>
               <strong id="email-target-text">priya.sharma@email.com</strong>
             </p>
+
+            <!-- Simulated OTP Notification Chip -->
+            <div class="simulated-otp-chip" id="email-sim-chip">
+              <span>💡 Simulated Code: <strong class="sim-otp-val" id="reg-email-sim-val">Loading...</strong></span>
+              <button type="button" class="btn-chip-autofill" id="btn-autofill-email-chip">Auto-fill</button>
+            </div>
+
             <div class="otp-boxes-grid" id="email-otp-grid">
               <input type="text" class="box-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*">
               <input type="text" class="box-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*">
@@ -401,6 +414,13 @@
               We have sent a 6-digit code to<br>
               <strong id="sms-target-text">+91 98765 43210</strong>
             </p>
+
+            <!-- Simulated OTP Notification Chip -->
+            <div class="simulated-otp-chip" id="sms-sim-chip">
+              <span>💡 Simulated Code: <strong class="sim-otp-val" id="reg-sms-sim-val">Loading...</strong></span>
+              <button type="button" class="btn-chip-autofill" id="btn-autofill-sms-chip">Auto-fill</button>
+            </div>
+
             <div class="otp-boxes-grid" id="sms-otp-grid">
               <input type="text" class="box-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*">
               <input type="text" class="box-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*">
@@ -577,6 +597,12 @@
 
       <!-- Step 2: Enter OTP & New Password -->
       <div id="forgot-step-2" class="modal-body hidden" style="text-align: left; margin-top: 1rem;">
+        <!-- Simulated Reset Code Chip -->
+        <div class="simulated-otp-chip" id="forgot-sim-chip" style="margin-bottom: 1rem;">
+          <span>💡 Reset Code: <strong class="sim-otp-val" id="forgot-sim-val">Loading...</strong></span>
+          <button type="button" class="btn-chip-autofill" id="btn-autofill-forgot-chip">Fill</button>
+        </div>
+
         <div class="form-group">
           <label for="forgot-otp-input">6-Digit Reset Code</label>
           <input type="text" id="forgot-otp-input" placeholder="123456" maxlength="6" style="width: 100%; height: 42px; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 0 0.85rem; letter-spacing: 0.2em; font-weight: 700; text-align: center;">
@@ -632,7 +658,7 @@
       <div class="modal-body" style="text-align: left; font-size: 0.85rem; color: #334155; line-height: 1.5; margin-top: 0.75rem;">
         <ul style="padding-left: 1.2rem; display: flex; flex-direction: column; gap: 0.5rem;">
           <li><strong>Check Spam/Junk folder</strong>: Verification emails can occasionally land in secondary filters.</li>
-          <li><strong>Simulated Delivery (Dev Mode)</strong>: As this is an IAM test environment, all OTPs are printed directly to your <strong>server console</strong> (e.g. <code>[SIMULATED EMAIL]</code> / <code>[SIMULATED SMS]</code>) and available in the <strong>Dev OTP Toolbar</strong> at the bottom right of the screen!</li>
+          <li><strong>Simulated Delivery (Dev Mode)</strong>: As this is an IAM test environment, all OTPs are printed directly to your <strong>server console</strong> (e.g. <code>[SIMULATED EMAIL]</code> / <code>[SIMULATED SMS]</code>) and shown on the <strong>Simulated Code banner</strong> directly on the screen!</li>
           <li><strong>Request a new code</strong>: If the code expired or did not arrive, click the button below to resend immediately.</li>
         </ul>
       </div>
