@@ -11,10 +11,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ------------------------------------------------------------------------
   // 0. App Startup: Check Active Session
   // ------------------------------------------------------------------------
-  const currentUserData = await api.getMe();
-  if (currentUserData && currentUserData.authenticated) {
-    authFlow.loadDashboard();
-  } else {
+  try {
+    const currentUserData = await api.getMe();
+    if (currentUserData && currentUserData.authenticated) {
+      await authFlow.loadDashboard();
+    } else {
+      authFlow.goToView('view-login');
+    }
+  } catch (e) {
     authFlow.goToView('view-login');
   }
 
@@ -29,8 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (linkGoToRegister) {
     linkGoToRegister.addEventListener('click', (e) => {
       e.preventDefault();
-      authFlow.goToView('view-register');
-      flow.goToScreen('screen-register');
+      flow.goToScreen('view-register');
     });
   }
 
@@ -90,7 +93,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const email = loginEmailInput.value.trim();
       const password = loginPasswordInput.value;
-      const rememberMe = loginRememberMe.checked;
+      const rememberMe = loginRememberMe ? loginRememberMe.checked : true;
 
       if (!email || !password) {
         authFlow.showLoginError('Please enter both email and password.');
@@ -313,6 +316,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     inputPassword.addEventListener('input', (e) => {
       const rules = validation.checkPasswordRules(e.target.value);
       const setRule = (el, isValid) => {
+        if (!el) return;
         if (isValid) el.classList.add('valid');
         else el.classList.remove('valid');
       };
@@ -323,7 +327,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  if (togglePasswordBtn) {
+  if (togglePasswordBtn && inputPassword) {
     togglePasswordBtn.addEventListener('click', () => {
       const isPwd = inputPassword.type === 'password';
       inputPassword.type = isPwd ? 'text' : 'password';

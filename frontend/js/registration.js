@@ -100,6 +100,10 @@ class RegistrationFlow {
    * Transition to screen
    */
   goToScreen(screenId) {
+    if (screenId === 'screen-register') {
+      screenId = 'view-register';
+    }
+
     this.state.currentStep = screenId;
     document.querySelectorAll('.screen-view').forEach(s => s.classList.remove('active'));
 
@@ -115,7 +119,7 @@ class RegistrationFlow {
 
     // Update 5-Step Stepper
     let stepNum = 1;
-    if (screenId === 'view-register') stepNum = 1;
+    if (screenId === 'view-register' || screenId === 'screen-register') stepNum = 1;
     else if (screenId === 'screen-email-otp') stepNum = 2;
     else if (screenId === 'screen-sms-otp') stepNum = 3;
     else if (screenId.startsWith('screen-mfa')) stepNum = 4;
