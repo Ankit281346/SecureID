@@ -2,17 +2,23 @@ require('dotenv').config();
 const path = require('path');
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 
 const registrationRoutes = require('./routes/registrationRoutes');
+const authRoutes = require('./routes/authRoutes');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Security & Parsing Middleware
-app.use(cors());
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // Serve frontend static assets
 app.use(express.static(path.join(__dirname, '../frontend')));
@@ -26,8 +32,9 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Mount IAM Registration Routes
+// Mount IAM Routes
 app.use('/api', registrationRoutes);
+app.use('/api', authRoutes);
 
 // Fallback for Single Page App navigation
 app.get('*', (req, res, next) => {
@@ -44,7 +51,7 @@ app.use(errorHandler);
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`=================================`);
-    console.log(` Truly IAS - IAM Auth Server (Part 1)`);
+    console.log(` Truly IAS - IAM Auth Server (Part 1 + Part 2)`);
     console.log(` Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(` Server running on: http://localhost:${PORT}`);
     console.log(`=================================`);

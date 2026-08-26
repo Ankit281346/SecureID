@@ -13,9 +13,16 @@ const devOtpStore = new Map();
  * @param {string} channel 'email' | 'sms'
  * @param {string} recipient
  * @param {string} otp
+ * @param {string} purpose 'registration' | 'login'
  */
-function logSimulatedDelivery(channel, recipient, otp) {
-  const header = channel === 'email' ? '[SIMULATED EMAIL]' : '[SIMULATED SMS]';
+function logSimulatedDelivery(channel, recipient, otp, purpose = 'registration') {
+  let header;
+  if (purpose === 'login') {
+    header = channel === 'email' ? '[SIMULATED LOGIN EMAIL]' : '[SIMULATED LOGIN SMS]';
+  } else {
+    header = channel === 'email' ? '[SIMULATED EMAIL]' : '[SIMULATED SMS]';
+  }
+
   console.log('=================================');
   console.log(header);
   console.log(`To: ${recipient}`);
@@ -30,14 +37,16 @@ function logSimulatedDelivery(channel, recipient, otp) {
  * @param {string} params.userId
  * @param {'email'|'sms'} params.channel
  * @param {string} params.recipient Email address or Phone number
+ * @param {string} [params.purpose='registration'] 'registration' | 'login'
  * @returns {Promise<{challengeId: string, expiresAt: Date}>}
  */
-async function createOtpChallenge({ userId, channel, recipient }) {
-  // Invalidate or supersede existing unverified challenges for this user and channel
+async function createOtpChallenge({ userId, channel, recipient, purpose = 'registration' }) {
+  // Invalidate or supersede existing unverified challenges for this user, channel, and purpose
   await prisma.otpChallenge.updateMany({
     where: {
       userId,
       channel,
+      purpose,
       verified: false
     },
     data: {
@@ -53,6 +62,7 @@ async function createOtpChallenge({ userId, channel, recipient }) {
     data: {
       userId,
       channel,
+      purpose,
       otpHash,
       expiresAt,
       attempts: 0,
@@ -65,13 +75,14 @@ async function createOtpChallenge({ userId, channel, recipient }) {
     devOtpStore.set(challenge.id, {
       challengeId: challenge.id,
       channel,
+      purpose,
       otp,
       expiresAt: expiresAt.toISOString()
     });
   }
 
   // Print simulated delivery to server console
-  logSimulatedDelivery(channel, recipient, otp);
+  logSimulatedDelivery(channel, recipient, otp, purpose);
 
   return {
     challengeId: challenge.id,
@@ -84,9 +95,10 @@ async function createOtpChallenge({ userId, channel, recipient }) {
  * @param {Object} params
  * @param {string} params.challengeId
  * @param {string} params.otp
+ * @param {string} [params.expectedPurpose]
  * @returns {Promise<{challenge: Object, user: Object}>}
  */
-async function verifyOtpChallenge({ challengeId, otp }) {
+async function verifyOtpChallenge({ challengeId, otp, expectedPurpose }) {
   if (!challengeId || !otp) {
     const error = new Error('Challenge ID and OTP are required.');
     error.statusCode = 400;
@@ -103,6 +115,13 @@ async function verifyOtpChallenge({ challengeId, otp }) {
     const error = new Error('OTP challenge not found.');
     error.statusCode = 404;
     error.code = 'CHALLENGE_NOT_FOUND';
+    throw error;
+  }
+
+  if (expectedPurpose && challenge.purpose !== expectedPurpose) {
+    const error = new Error('Invalid challenge purpose.');
+    error.statusCode = 400;
+    error.code = 'INVALID_PURPOSE';
     throw error;
   }
 

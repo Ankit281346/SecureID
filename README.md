@@ -1,63 +1,76 @@
-# IAM Authentication & Registration — Part 1
+# SecureID — Enterprise IAM Authentication System (Part 1 & Part 2)
 
-A clean, robust, and production-grade implementation of the **Registration + Email OTP + SMS OTP + MFA Verification** flow for an Identity and Access Management (IAM) system.
-
----
-
-## 🚀 Features
-
-* **Strict Part 1 Scope**: Implements only Registration, Email OTP verification, SMS OTP verification, and MFA enablement. No Login, JWT, sessions, or password reset functionality is present.
-* **Modern Secure Frontend**: Built with responsive HTML5, modern CSS3 (matching SecureID design specification), and modular Vanilla JavaScript using the Fetch API.
-* **Security & Cryptography**:
-  * Passwords hashed with `bcryptjs` (salt rounds: 10).
-  * 6-digit OTPs generated using Node.js `crypto.randomInt` (cryptographically secure, never `Math.random`).
-  * OTPs stored in database as SHA-256 HMAC hashes with server salt. Plaintext OTP is never stored in the database.
-  * OTPs expire in **5 minutes**.
-  * Maximum **5 verification attempts** with lockout.
-  * Single-use OTP: invalidates immediately upon successful verification.
-* **Simulated Multi-Channel Delivery**:
-  * Email & SMS deliveries are simulated with clean server console output.
-  * Non-production endpoint `GET /api/test/otp/:challengeId` allows dev test retrieval from an in-memory store (automatically blocked with `403 Forbidden` in production).
-* **Persistent SQLite Database**: Managed via **Prisma ORM**.
+A robust, enterprise-grade Identity & Access Management (IAM) authentication system built with **Node.js, Express, Prisma ORM (SQLite), and Vanilla HTML5/CSS3/JavaScript**.
 
 ---
 
-## 📁 Project Architecture
+## 🌟 Capabilities & Features
+
+### Part 1: Registration & MFA Enrollment
+* **User Registration**: Multi-field input validation (Name, Email, Mobile, Password with live requirements checklist, Confirm Password).
+* **Cryptographic Security**: Passwords hashed with `bcryptjs` (salt rounds: 10). 6-digit OTPs generated with `crypto.randomInt`.
+* **Database Hashing**: OTPs stored as HMAC-SHA256 hashes with server salt. Plaintext is never stored in the database.
+* **Email & SMS OTP**: 5-minute expiry, single-use invalidation, attempt tracking with 5-attempt lockout, simulated console delivery.
+* **MFA Enrollment**: Activates multi-factor authentication upon mobile SMS verification.
+
+### Part 2: Login, Sessions, Lockout & JWT Authentication
+* **Credential Validation**: Validates user credentials with protection against timing/enumeration attacks.
+* **Account Lockout Policy**: Automatically locks accounts for 15 minutes after 5 consecutive failed login attempts (`ACCOUNT_LOCKED`).
+* **Login MFA Flow**: Detects `mfaEnabled`, issues single-use login OTP challenge, verifies OTP, and logs simulated login delivery.
+* **Server-Side Session Management**: Creates session in database with `HttpOnly`, `SameSite=lax`, and `Secure` (production) cookie. Supports "Remember Me" (extended 30-day session lifetime vs 24-hour default).
+* **Session Profile API (`GET /api/me`)**: Returns authenticated user profile or `401 Unauthorized` if unauthenticated.
+* **Secure Logout (`POST /api/logout`)**: Invalidates server-side session and clears the cookie.
+* **Stateless JWT Token Issuance (`POST /api/token`)**: Issues signed, short-lived (15-minute) JWT tokens for authenticated users.
+* **JWT-Protected API (`GET /api/protected`)**: Requires `Authorization: Bearer <token>`, validating signature and expiration.
+* **Interactive Frontend Dashboard**: Live user profile viewer and interactive JWT generation & API tester widget.
+
+---
+
+## 📁 Project Structure
 
 ```
 Truly IAS/
 ├── backend/
-│   ├── server.js                      # Express server & static asset host
+│   ├── server.js                      # Express server with cookie-parser and static hosting
 │   ├── routes/
-│   │   └── registrationRoutes.js      # REST API route definitions
+│   │   ├── registrationRoutes.js      # Part 1 Registration routes
+│   │   └── authRoutes.js              # Part 2 Login, MFA, Session & JWT routes
 │   ├── controllers/
-│   │   └── registrationController.js  # Controller actions
+│   │   ├── registrationController.js  # Registration controller
+│   │   └── authController.js          # Login, MFA, Session, Me, Logout & JWT controller
 │   ├── services/
-│   │   ├── prisma.js                  # Shared Prisma client instance
-│   │   └── otpService.js              # Secure OTP generation, hashing & attempts
+│   │   ├── prisma.js                  # Shared Prisma client (/tmp SQLite serverless support)
+│   │   ├── otpService.js              # Crypto OTP generation & hash verification
+│   │   ├── sessionService.js          # Server session DB management & cookie options
+│   │   └── jwtService.js              # JWT signing & Bearer verification
 │   ├── middleware/
-│   │   ├── validation.js              # Payload & password complexity validation
-│   │   └── errorHandler.js            # Standardized JSON error handler
+│   │   ├── authMiddleware.js          # requireAuth session validator
+│   │   ├── jwtMiddleware.js           # requireJWT Bearer token validator
+│   │   ├── validation.js              # Payload validation middleware
+│   │   └── errorHandler.js            # Standardized error response handler
 │   └── utils/
-│       ├── otp.js                     # Crypto-based OTP generator
+│       ├── otp.js                     # Secure random digit generator
 │       └── hashing.js                 # Bcrypt & SHA-256 HMAC hashing
 │
 ├── frontend/
-│   ├── index.html                     # Multi-step UI matching SecureID specs
+│   ├── index.html                     # Responsive UI matching SecureID design
 │   ├── css/
-│   │   └── styles.css                 # Responsive styles & animations
+│   │   └── styles.css                 # Modern CSS design system
 │   └── js/
-│       ├── app.js                     # UI controller & event listeners
 │       ├── api.js                     # Fetch API client
-│       ├── validation.js              # Live password validation helper
-│       └── registration.js            # Stepper & OTP timer state machine
+│       ├── validation.js              # Password & input validation helpers
+│       ├── registration.js            # Registration multi-step state machine
+│       ├── auth.js                    # Login, MFA, Dashboard & JWT tester
+│       └── app.js                     # App initialization & navigation
 │
 ├── prisma/
-│   ├── schema.prisma                  # User and OtpChallenge models
+│   ├── schema.prisma                  # User, Session, and OtpChallenge models
 │   └── dev.db                         # SQLite database
 │
 ├── tests/
-│   └── registrationFlow.test.js       # 13 comprehensive end-to-end test suites
+│   ├── registrationFlow.test.js       # 13 Registration test suites
+│   └── loginFlow.test.js              # 15 Login, MFA, Session & JWT test suites
+├── vercel.json                        # Vercel deployment configuration
 ├── .env
 ├── .gitignore
 └── package.json
@@ -65,70 +78,9 @@ Truly IAS/
 
 ---
 
-## 🛠️ Quick Start
+## 📡 API Endpoints
 
-### 1. Install Dependencies
-```bash
-npm install
-```
-
-### 2. Push Database Schema
-```bash
-npx prisma db push
-```
-
-### 3. Run Automated Tests
-```bash
-npm test
-```
-
-### 4. Start the Application
-```bash
-npm start
-```
-Open your browser and navigate to:
-```
-http://localhost:5000
-```
-
----
-
-## 🔄 Exact Registration Journey
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│ 1. Registration Details Form (Name, Email, Phone, Password) │
-└──────────────────────────────┬──────────────────────────────┘
-                               │ POST /api/register
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│ 2. Email OTP Challenge Generated (Expires: 5 mins)          │
-│    - Console logs [SIMULATED EMAIL]                         │
-│    - User enters 6-digit Email OTP                          │
-└──────────────────────────────┬──────────────────────────────┘
-                               │ POST /api/verify-email-otp
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│ 3. Email Verified (emailVerified = true)                    │
-│    - SMS OTP Challenge Generated (Expires: 5 mins)          │
-│    - Console logs [SIMULATED SMS]                           │
-│    - User enters 6-digit SMS OTP                            │
-└──────────────────────────────┬──────────────────────────────┘
-                               │ POST /api/verify-sms-otp
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│ 4. Phone Verified & MFA Enabled                             │
-│    - phoneVerified = true                                   │
-│    - mfaEnabled = true                                      │
-│    - Displays Registration Success Screen                   │
-│    - "Continue to Login" Button (Login slated for Part 2)   │
-└─────────────────────────────────────────────────────────────┘
-```
-
----
-
-## 📡 API Endpoints Summary
-
+### Registration (Part 1)
 | Method | Endpoint | Description |
 |---|---|---|
 | `POST` | `/api/register` | Register user and issue email OTP challenge |
@@ -136,4 +88,37 @@ http://localhost:5000
 | `POST` | `/api/verify-email-otp` | Verify email OTP & transition to SMS OTP |
 | `POST` | `/api/send-sms-otp` | Resend SMS OTP (resets attempts & 5-min timer) |
 | `POST` | `/api/verify-sms-otp` | Verify SMS OTP & enable MFA |
-| `GET`  | `/api/test/otp/:challengeId` | Dev-only test OTP inspection (`NODE_ENV !== 'production'`) |
+| `GET`  | `/api/test/otp/:challengeId` | Dev-only test OTP retrieval (`NODE_ENV !== 'production'`) |
+
+### Login, MFA, Session & JWT (Part 2)
+| Method | Endpoint | Auth Required | Description |
+|---|---|---|---|
+| `POST` | `/api/login` | None | Validate credentials, check lockout, issue MFA or session |
+| `POST` | `/api/verify-login-otp` | None | Verify login OTP & create session with cookie |
+| `POST` | `/api/send-login-otp` | None | Resend login OTP |
+| `GET`  | `/api/me` | Session Cookie | Return authenticated user details |
+| `POST` | `/api/logout` | Session Cookie | Invalidate session & clear cookie |
+| `POST` | `/api/token` | Session Cookie | Issue 15-minute JWT access token |
+| `GET`  | `/api/protected` | Bearer JWT | Access JWT-protected resource |
+
+---
+
+## 🧪 Running Automated Tests
+
+Run all 28 automated integration & security test suites:
+
+```bash
+npm test
+# Or run individually:
+node tests/loginFlow.test.js
+node tests/registrationFlow.test.js
+```
+
+---
+
+## 🚀 Running Locally
+
+```bash
+npm start
+```
+Navigate to **[http://localhost:5000](http://localhost:5000)** in your browser.

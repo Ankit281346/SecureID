@@ -8,17 +8,20 @@ datasource db {
 }
 
 model User {
-  id             String         @id @default(uuid())
-  name           String
-  email          String         @unique
-  phone          String         @unique
-  passwordHash   String
-  emailVerified  Boolean        @default(false)
-  phoneVerified  Boolean        @default(false)
-  mfaEnabled     Boolean        @default(false)
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-  otpChallenges  OtpChallenge[]
+  id                  String         @id @default(uuid())
+  name                String
+  email               String         @unique
+  phone               String         @unique
+  passwordHash        String
+  emailVerified       Boolean        @default(false)
+  phoneVerified       Boolean        @default(false)
+  mfaEnabled          Boolean        @default(false)
+  failedLoginAttempts Int            @default(0)
+  lockedUntil         DateTime?
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  otpChallenges       OtpChallenge[]
+  sessions            Session[]
 }
 
 model OtpChallenge {
@@ -26,9 +29,18 @@ model OtpChallenge {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   channel   String   // "email" | "sms"
+  purpose   String   @default("registration") // "registration" | "login"
   otpHash   String
   expiresAt DateTime
   attempts  Int      @default(0)
   verified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
   createdAt DateTime @default(now())
 }

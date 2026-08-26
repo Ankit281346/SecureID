@@ -11,383 +11,203 @@
 </head>
 <body>
   <div class="page-wrapper">
-    <!-- Main Card Container -->
-    <div class="card-container">
+    
+    <!-- ============================================== -->
+    <!-- SPLIT-PANEL AUTH CARD                          -->
+    <!-- ============================================== -->
+    <div class="auth-card-split" id="auth-main-card">
       
-      <!-- Top Brand Header & 5-Step Stepper -->
-      <div class="brand-bar">
-        <div class="brand-logo">
-          <svg class="brand-shield" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
-          </svg>
-          <span class="brand-name">Secure<strong>ID</strong></span>
+      <!-- Left Blue Brand Sidebar (Visible on Web) -->
+      <aside class="auth-sidebar" id="auth-sidebar">
+        <div class="sidebar-brand">
+          <div class="sidebar-shield">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+            </svg>
+          </div>
+          <h1 class="sidebar-title">SecureID</h1>
+          <p class="sidebar-subtitle">Secure access to your account</p>
+        </div>
+      </aside>
+
+      <!-- Right Main Content Panel -->
+      <main class="auth-content-panel">
+
+        <!-- Header Navigation Bar (Registration Stepper or Mode Switcher) -->
+        <div class="auth-panel-top">
+          <!-- Stepper (Shown only during Registration flow) -->
+          <div class="stepper hidden" id="stepper">
+            <div class="step-node active" data-step="1">1</div>
+            <div class="step-connector" data-connector="1"></div>
+            <div class="step-node" data-step="2">2</div>
+            <div class="step-connector" data-connector="2"></div>
+            <div class="step-node" data-step="3">3</div>
+            <div class="step-connector" data-connector="3"></div>
+            <div class="step-node" data-step="4">4</div>
+            <div class="step-connector" data-connector="4"></div>
+            <div class="step-node" data-step="5">5</div>
+          </div>
         </div>
 
-        <!-- Stepper (1 to 5) -->
-        <div class="stepper" id="stepper">
-          <div class="step-node active" data-step="1">1</div>
-          <div class="step-connector" data-connector="1"></div>
-          <div class="step-node" data-step="2">2</div>
-          <div class="step-connector" data-connector="2"></div>
-          <div class="step-node" data-step="3">3</div>
-          <div class="step-connector" data-connector="3"></div>
-          <div class="step-node" data-step="4">4</div>
-          <div class="step-connector" data-connector="4"></div>
-          <div class="step-node" data-step="5">5</div>
-        </div>
-      </div>
-
-      <!-- ============================================== -->
-      <!-- SCREEN 1: REGISTER - DETAILS                   -->
-      <!-- ============================================== -->
-      <div id="screen-register" class="screen active">
-        <div class="screen-title-group">
-          <h2>Create your account</h2>
-          <p>Let's get you started</p>
-        </div>
-
-        <form id="form-register" novalidate>
-          <div class="form-columns">
-            <!-- Left Column: Inputs -->
-            <div class="form-col-left">
-              <div class="form-group">
-                <label for="reg-name">Full Name</label>
-                <input type="text" id="reg-name" name="name" placeholder="Priya Sharma" required autocomplete="name">
-                <span class="field-error" id="error-name"></span>
-              </div>
-
-              <div class="form-group">
-                <label for="reg-email">Email</label>
-                <input type="email" id="reg-email" name="email" placeholder="priya.sharma@email.com" required autocomplete="email">
-                <span class="field-error" id="error-email"></span>
-              </div>
-
-              <div class="form-group">
-                <label for="reg-phone">Mobile Number</label>
-                <div class="phone-row">
-                  <div class="country-prefix">
-                    <span>+91</span>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                  </div>
-                  <input type="tel" id="reg-phone" name="phone" placeholder="98765 43210" required autocomplete="tel">
-                </div>
-                <span class="field-error" id="error-phone"></span>
-              </div>
-
-              <div class="form-group">
-                <label for="reg-password">Password</label>
-                <div class="input-password-wrapper">
-                  <input type="password" id="reg-password" name="password" placeholder="••••••••••••" required autocomplete="new-password">
-                  <button type="button" class="btn-toggle-eye" id="toggle-password" aria-label="Toggle password">
-                    <svg class="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                    <svg class="eye-closed hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                  </button>
-                </div>
-                <span class="field-error" id="error-password"></span>
-              </div>
-            </div>
-
-            <!-- Right Column: Password Rules & Terms -->
-            <div class="form-col-right">
-              <div class="pwd-rules-box">
-                <div class="pwd-rules-header">Password must contain:</div>
-                <div class="rule-row" id="rule-length">
-                  <span class="rule-badge">✓</span>
-                  <span>At least 8 characters</span>
-                </div>
-                <div class="rule-row" id="rule-uppercase">
-                  <span class="rule-badge">✓</span>
-                  <span>1 uppercase letter</span>
-                </div>
-                <div class="rule-row" id="rule-number">
-                  <span class="rule-badge">✓</span>
-                  <span>1 number</span>
-                </div>
-                <div class="rule-row" id="rule-special">
-                  <span class="rule-badge">✓</span>
-                  <span>1 special character</span>
-                </div>
-              </div>
-
-              <div class="terms-row">
-                <input type="checkbox" id="reg-terms" checked required>
-                <label for="reg-terms">
-                  I agree to the <a href="#" class="terms-link">Terms &amp; Conditions</a> and <a href="#" class="terms-link">Privacy Policy</a>
-                </label>
-              </div>
+        <!-- ============================================== -->
+        <!-- VIEW: LOGIN (DEFAULT)                         -->
+        <!-- ============================================== -->
+        <div id="view-login" class="screen-view active">
+          <div class="screen-icon-center" id="login-icon-badge">
+            <div class="round-badge blue-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
             </div>
           </div>
 
-          <button type="submit" class="btn-solid-blue" id="btn-create-account">
-            Create Account
-          </button>
-        </form>
-
-        <div class="auth-bottom-link">
-          Already have an account? <a href="#" id="link-login">Login</a>
-        </div>
-      </div>
-
-      <!-- ============================================== -->
-      <!-- SCREEN 2: EMAIL VERIFICATION - OTP             -->
-      <!-- ============================================== -->
-      <div id="screen-email-otp" class="screen">
-        <div class="center-content">
-          <div class="round-icon-badge blue-badge" id="email-badge-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <div class="screen-title-group text-center">
+            <h2>Welcome back!</h2>
+            <p>Login to your account</p>
           </div>
 
-          <h2 class="section-heading">Verify your email</h2>
-          <p class="section-subheading">
-            We have sent a 6-digit code to<br>
-            <strong id="email-target-text">priya.sharma@email.com</strong>
-          </p>
+          <form id="form-login" novalidate>
+            <div class="form-group">
+              <div class="input-with-icon">
+                <span class="input-leading-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </span>
+                <input type="text" id="login-email" name="email" placeholder="Email or Username" required autocomplete="username">
+              </div>
+            </div>
 
-          <!-- 6-digit OTP Box Inputs -->
-          <div class="otp-boxes-grid" id="email-otp-grid">
-            <input type="text" class="box-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
-            <input type="text" class="box-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*">
-            <input type="text" class="box-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*">
-            <input type="text" class="box-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*">
-            <input type="text" class="box-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*">
-            <input type="text" class="box-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*">
-          </div>
+            <div class="form-group">
+              <div class="input-with-icon">
+                <span class="input-leading-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </span>
+                <input type="password" id="login-password" name="password" placeholder="Password" required autocomplete="current-password">
+                <button type="button" class="btn-toggle-eye" id="toggle-login-password" aria-label="Toggle password visibility">
+                  <svg class="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  <svg class="eye-closed hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                </button>
+              </div>
+            </div>
 
-          <!-- Dynamic Error Messages -->
-          <div class="error-feedback-box hidden" id="email-error-box">
-            <div class="err-main-text" id="email-err-main">Incorrect code. Please try again.</div>
-            <div class="err-sub-text" id="email-err-sub">You have 2 attempts left.</div>
-          </div>
+            <!-- Error Banner (Invalid credentials or lockout) -->
+            <div class="login-error-banner hidden" id="login-error-banner">
+              <span id="login-error-text">Invalid email or password. Please try again.</span>
+            </div>
 
-          <!-- Timer & Resend Display -->
-          <div class="timer-line" id="email-timer-wrap">
-            Code expires in <strong id="email-countdown">02:45</strong>
-          </div>
+            <div class="form-row-between">
+              <label class="checkbox-label">
+                <input type="checkbox" id="login-remember-me" checked>
+                <span>Remember me</span>
+              </label>
+              <a href="#" class="link-forgot" id="link-forgot-password">Forgot password?</a>
+            </div>
 
-          <div class="resend-line" id="email-resend-wrap">
-            <button type="button" class="btn-resend-link" id="btn-resend-email" disabled>
-              Resend code <span id="email-cooldown-text">(00:25)</span>
+            <button type="submit" class="btn-solid-blue" id="btn-submit-login">
+              Login
             </button>
-          </div>
 
-          <!-- Action Button (Shown for expired state or submit) -->
-          <div class="action-btn-wrap">
-            <button type="button" class="btn-solid-blue hidden" id="btn-resend-expired-email">
-              Resend New Code
-            </button>
-            <button type="button" class="btn-solid-blue" id="btn-verify-email">
-              Verify Email
-            </button>
-          </div>
+            <div class="divider-text">
+              <span>or</span>
+            </div>
 
-          <div class="bottom-helper-link">
-            <a href="#" id="link-email-help">Didn't receive the code?</a>
+            <button type="button" class="btn-social-google" id="btn-google-login">
+              <svg viewBox="0 0 24 24" class="google-logo">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+              </svg>
+              <span>Continue with Google</span>
+            </button>
+          </form>
+
+          <div class="auth-bottom-link">
+            New here? <a href="#" id="link-go-to-register">Create an account</a>
           </div>
         </div>
-      </div>
 
-      <!-- ============================================== -->
-      <!-- SCREEN 3: MOBILE VERIFICATION - OTP            -->
-      <!-- ============================================== -->
-      <div id="screen-sms-otp" class="screen">
-        <div class="center-content">
-          <div class="round-icon-badge green-badge" id="sms-badge-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        <!-- ============================================== -->
+        <!-- VIEW: CHOOSE MFA METHOD                        -->
+        <!-- ============================================== -->
+        <div id="view-login-mfa-choose" class="screen-view">
+          <div class="screen-icon-center">
+            <div class="round-badge blue-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
           </div>
 
-          <h2 class="section-heading">Verify your mobile</h2>
-          <p class="section-subheading">
-            We have sent a 6-digit code to<br>
-            <strong id="sms-target-text">+91 98765 43210</strong>
-          </p>
-
-          <!-- 6-digit OTP Box Inputs -->
-          <div class="otp-boxes-grid" id="sms-otp-grid">
-            <input type="text" class="box-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
-            <input type="text" class="box-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*">
-            <input type="text" class="box-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*">
-            <input type="text" class="box-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*">
-            <input type="text" class="box-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*">
-            <input type="text" class="box-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*">
+          <div class="screen-title-group text-center">
+            <h2>Verify your identity</h2>
+            <p>Choose a method to continue</p>
           </div>
-
-          <!-- Dynamic Error Messages -->
-          <div class="error-feedback-box hidden" id="sms-error-box">
-            <div class="err-main-text" id="sms-err-main">Incorrect code. Please try again.</div>
-            <div class="err-sub-text" id="sms-err-sub">You have 1 attempt left.</div>
-          </div>
-
-          <!-- Timer & Resend Display -->
-          <div class="timer-line" id="sms-timer-wrap">
-            Code expires in <strong id="sms-countdown">02:45</strong>
-          </div>
-
-          <div class="resend-line" id="sms-resend-wrap">
-            <button type="button" class="btn-resend-link" id="btn-resend-sms" disabled>
-              Resend code <span id="sms-cooldown-text">(00:25)</span>
-            </button>
-          </div>
-
-          <!-- Action Button -->
-          <div class="action-btn-wrap">
-            <button type="button" class="btn-solid-blue hidden" id="btn-resend-expired-sms">
-              Resend New Code
-            </button>
-            <button type="button" class="btn-solid-blue" id="btn-verify-sms">
-              Verify Mobile
-            </button>
-          </div>
-
-          <div class="bottom-helper-link">
-            Wrong number? <a href="#" id="link-change-number">Change</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- ============================================== -->
-      <!-- SCREEN 4: SET UP MFA (Method Options)          -->
-      <!-- ============================================== -->
-      <div id="screen-mfa-options" class="screen">
-        <div class="center-content">
-          <div class="round-icon-badge blue-badge">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          </div>
-
-          <h2 class="section-heading">Set up Multi-Factor Auth</h2>
-          <p class="section-subheading">
-            Add an extra layer of security to protect your account.
-          </p>
 
           <div class="mfa-options-list">
-            <label class="mfa-option-card selected">
-              <input type="radio" name="mfa-method" value="authenticator" checked>
+            <label class="mfa-option-card selected" data-method="email">
+              <input type="radio" name="login-mfa-method" value="email" checked>
+              <div class="option-icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </div>
+              <div class="option-content">
+                <div class="option-title">Email OTP</div>
+                <div class="option-desc">Receive a code on your email</div>
+              </div>
+              <div class="option-radio-dot"></div>
+            </label>
+
+            <label class="mfa-option-card" data-method="sms">
+              <input type="radio" name="login-mfa-method" value="sms">
+              <div class="option-icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              </div>
+              <div class="option-content">
+                <div class="option-title">SMS OTP</div>
+                <div class="option-desc">Receive a code on your mobile</div>
+              </div>
+              <div class="option-radio-dot"></div>
+            </label>
+
+            <label class="mfa-option-card" data-method="authenticator">
+              <input type="radio" name="login-mfa-method" value="authenticator">
               <div class="option-icon-box">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
               </div>
               <div class="option-content">
                 <div class="option-title">Authenticator App</div>
-                <div class="option-desc">Google Authenticator / Authy</div>
-              </div>
-              <div class="option-radio-dot"></div>
-            </label>
-
-            <label class="mfa-option-card">
-              <input type="radio" name="mfa-method" value="sms">
-              <div class="option-icon-box">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-              </div>
-              <div class="option-content">
-                <div class="option-title">SMS Authentication</div>
-                <div class="option-desc">Receive codes on your mobile</div>
-              </div>
-              <div class="option-radio-dot"></div>
-            </label>
-
-            <label class="mfa-option-card">
-              <input type="radio" name="mfa-method" value="email">
-              <div class="option-icon-box">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-              </div>
-              <div class="option-content">
-                <div class="option-title">Email Authentication</div>
-                <div class="option-desc">Receive codes on your email</div>
+                <div class="option-desc">Use code from authenticator app</div>
               </div>
               <div class="option-radio-dot"></div>
             </label>
           </div>
 
-          <button type="button" class="btn-solid-blue" id="btn-mfa-continue">
+          <button type="button" class="btn-solid-blue" id="btn-login-mfa-continue">
             Continue
           </button>
         </div>
-      </div>
 
-      <!-- ============================================== -->
-      <!-- SCREEN 5: AUTHENTICATOR SETUP / SCAN QR CODE   -->
-      <!-- ============================================== -->
-      <div id="screen-mfa-qr" class="screen">
-        <div class="center-content">
-          <h2 class="section-heading">Scan QR Code</h2>
-          <p class="section-subheading">
-            Open your authenticator app and scan this QR code
-          </p>
-
-          <div class="qr-container">
-            <svg class="qr-svg-render" viewBox="0 0 160 160" width="160" height="160">
-              <!-- Crisp Simulated QR Code Pattern -->
-              <rect width="160" height="160" fill="#ffffff"/>
-              <!-- Position Top-Left -->
-              <rect x="10" y="10" width="40" height="40" fill="#000000"/>
-              <rect x="16" y="16" width="28" height="28" fill="#ffffff"/>
-              <rect x="22" y="22" width="16" height="16" fill="#000000"/>
-              <!-- Position Top-Right -->
-              <rect x="110" y="10" width="40" height="40" fill="#000000"/>
-              <rect x="116" y="16" width="28" height="28" fill="#ffffff"/>
-              <rect x="122" y="22" width="16" height="16" fill="#000000"/>
-              <!-- Position Bottom-Left -->
-              <rect x="10" y="110" width="40" height="40" fill="#000000"/>
-              <rect x="16" y="116" width="28" height="28" fill="#ffffff"/>
-              <rect x="22" y="122" width="16" height="16" fill="#000000"/>
-              <!-- Data Pixels Pattern -->
-              <rect x="60" y="15" width="8" height="8" fill="#000000"/>
-              <rect x="75" y="15" width="8" height="8" fill="#000000"/>
-              <rect x="90" y="25" width="8" height="8" fill="#000000"/>
-              <rect x="60" y="35" width="8" height="8" fill="#000000"/>
-              <rect x="80" y="45" width="8" height="8" fill="#000000"/>
-              <rect x="20" y="60" width="8" height="8" fill="#000000"/>
-              <rect x="35" y="70" width="8" height="8" fill="#000000"/>
-              <rect x="50" y="60" width="8" height="8" fill="#000000"/>
-              <rect x="65" y="70" width="8" height="8" fill="#000000"/>
-              <rect x="80" y="60" width="8" height="8" fill="#000000"/>
-              <rect x="95" y="70" width="8" height="8" fill="#000000"/>
-              <rect x="110" y="60" width="8" height="8" fill="#000000"/>
-              <rect x="135" y="70" width="8" height="8" fill="#000000"/>
-              <rect x="20" y="85" width="8" height="8" fill="#000000"/>
-              <rect x="40" y="95" width="8" height="8" fill="#000000"/>
-              <rect x="60" y="85" width="8" height="8" fill="#000000"/>
-              <rect x="75" y="95" width="8" height="8" fill="#000000"/>
-              <rect x="95" y="85" width="8" height="8" fill="#000000"/>
-              <rect x="115" y="95" width="8" height="8" fill="#000000"/>
-              <rect x="135" y="85" width="8" height="8" fill="#000000"/>
-              <rect x="60" y="110" width="8" height="8" fill="#000000"/>
-              <rect x="80" y="125" width="8" height="8" fill="#000000"/>
-              <rect x="95" y="110" width="8" height="8" fill="#000000"/>
-              <rect x="110" y="125" width="8" height="8" fill="#000000"/>
-              <rect x="130" y="110" width="8" height="8" fill="#000000"/>
-              <rect x="140" y="130" width="8" height="8" fill="#000000"/>
-              <rect x="65" y="140" width="8" height="8" fill="#000000"/>
-              <rect x="85" y="140" width="8" height="8" fill="#000000"/>
-              <rect x="115" y="140" width="8" height="8" fill="#000000"/>
-            </svg>
+        <!-- ============================================== -->
+        <!-- VIEW: LOGIN MFA (EMAIL / SMS OTP)             -->
+        <!-- ============================================== -->
+        <div id="view-login-mfa-otp" class="screen-view">
+          <div class="screen-icon-center">
+            <div class="round-badge blue-badge" id="login-mfa-badge-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+            </div>
           </div>
 
-          <div class="bottom-helper-link">
-            Can't scan? <a href="#" id="link-setup-key">Enter setup key</a>
+          <div class="screen-title-group text-center">
+            <h2 id="login-mfa-heading">Email Verification</h2>
+            <p>
+              Enter the 6-digit code sent to<br>
+              <strong id="login-mfa-target-text">priya.sharma@email.com</strong>
+            </p>
           </div>
-
-          <div class="two-btn-row">
-            <button type="button" class="btn-outline-gray" id="btn-qr-back">Back</button>
-            <button type="button" class="btn-solid-blue" id="btn-qr-continue">Continue</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- ============================================== -->
-      <!-- SCREEN 6: MFA CODE VERIFICATION                -->
-      <!-- ============================================== -->
-      <div id="screen-mfa-code" class="screen">
-        <div class="center-content">
-          <div class="round-icon-badge blue-badge" id="mfa-badge-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          </div>
-
-          <h2 class="section-heading">Enter the 6-digit code</h2>
-          <p class="section-subheading">
-            Enter the code from your authenticator app
-          </p>
 
           <!-- 6-digit OTP Box Inputs -->
-          <div class="otp-boxes-grid" id="mfa-otp-grid">
+          <div class="otp-boxes-grid" id="login-mfa-otp-grid">
             <input type="text" class="box-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
             <input type="text" class="box-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*">
             <input type="text" class="box-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*">
@@ -397,84 +217,349 @@
           </div>
 
           <!-- Dynamic Error Messages -->
-          <div class="error-feedback-box hidden" id="mfa-error-box">
-            <div class="err-main-text" id="mfa-err-main">Invalid code. Please try again.</div>
+          <div class="error-feedback-box hidden" id="login-mfa-error-box">
+            <div class="err-main-text" id="login-mfa-err-main">Incorrect code. Please try again.</div>
+            <div class="err-sub-text" id="login-mfa-err-sub">You have 2 attempts left.</div>
           </div>
 
-          <!-- Timer Display -->
-          <div class="timer-line" id="mfa-timer-wrap">
-            Code expires in <strong id="mfa-countdown">00:28</strong>
+          <!-- Timer & Resend Display -->
+          <div class="timer-line" id="login-mfa-timer-wrap">
+            Code expires in <strong id="login-mfa-countdown">02:45</strong>
           </div>
 
-          <button type="button" class="btn-solid-blue" id="btn-verify-mfa-code">
-            Verify &amp; Enable MFA
-          </button>
+          <div class="resend-line" id="login-mfa-resend-wrap">
+            <button type="button" class="btn-resend-link" id="btn-resend-login-otp" disabled>
+              Resend code <span id="login-mfa-cooldown-text">(00:25)</span>
+            </button>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-btn-wrap">
+            <button type="button" class="btn-solid-blue hidden" id="btn-resend-expired-login-otp">
+              Resend code
+            </button>
+            <button type="button" class="btn-solid-blue" id="btn-verify-login-otp">
+              Verify
+            </button>
+          </div>
 
           <div class="bottom-helper-link">
-            <a href="#" id="link-mfa-help">Can't access your app?</a>
+            <a href="#" id="link-login-mfa-help">Didn't receive the code?</a>
+          </div>
+
+          <div class="auth-bottom-link">
+            <a href="#" id="link-back-to-login">← Back to Login</a>
           </div>
         </div>
-      </div>
 
-      <!-- ============================================== -->
-      <!-- SCREEN 7: REGISTRATION SUCCESS                 -->
-      <!-- ============================================== -->
-      <div id="screen-success" class="screen">
-        <div class="center-content">
-          <div class="round-icon-badge green-badge-solid">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+        <!-- ============================================== -->
+        <!-- VIEW: REGISTRATION FLOW (PART 1 PRESERVED)     -->
+        <!-- ============================================== -->
+        <div id="view-register" class="screen-view">
+          <div class="screen-title-group">
+            <h2>Create your account</h2>
+            <p>Let's get you started</p>
           </div>
 
-          <h2 class="section-heading">Account created!</h2>
-          <p class="section-subheading">
-            Your account has been created<br>successfully and MFA is enabled.
-          </p>
+          <form id="form-register" novalidate>
+            <div class="form-columns">
+              <!-- Left Column -->
+              <div class="form-col-left">
+                <div class="form-group">
+                  <label for="reg-name">Full Name</label>
+                  <input type="text" id="reg-name" name="name" placeholder="Priya Sharma" required autocomplete="name">
+                  <span class="field-error" id="error-name"></span>
+                </div>
 
-          <div class="success-checklist">
-            <div class="check-item">
-              <span class="check-tick">✓</span>
-              <span>Email verified</span>
+                <div class="form-group">
+                  <label for="reg-email">Email</label>
+                  <input type="email" id="reg-email" name="email" placeholder="priya.sharma@email.com" required autocomplete="email">
+                  <span class="field-error" id="error-email"></span>
+                </div>
+
+                <div class="form-group">
+                  <label for="reg-phone">Mobile Number</label>
+                  <div class="phone-row">
+                    <div class="country-prefix">
+                      <span>+91</span>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </div>
+                    <input type="tel" id="reg-phone" name="phone" placeholder="98765 43210" required autocomplete="tel">
+                  </div>
+                  <span class="field-error" id="error-phone"></span>
+                </div>
+
+                <div class="form-group">
+                  <label for="reg-password">Password</label>
+                  <div class="input-password-wrapper">
+                    <input type="password" id="reg-password" name="password" placeholder="••••••••••••" required autocomplete="new-password">
+                    <button type="button" class="btn-toggle-eye" id="toggle-password" aria-label="Toggle password">
+                      <svg class="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                      <svg class="eye-closed hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                    </button>
+                  </div>
+                  <span class="field-error" id="error-password"></span>
+                </div>
+              </div>
+
+              <!-- Right Column -->
+              <div class="form-col-right">
+                <div class="pwd-rules-box">
+                  <div class="pwd-rules-header">Password must contain:</div>
+                  <div class="rule-row" id="rule-length">
+                    <span class="rule-badge">✓</span>
+                    <span>At least 8 characters</span>
+                  </div>
+                  <div class="rule-row" id="rule-uppercase">
+                    <span class="rule-badge">✓</span>
+                    <span>1 uppercase letter</span>
+                  </div>
+                  <div class="rule-row" id="rule-number">
+                    <span class="rule-badge">✓</span>
+                    <span>1 number</span>
+                  </div>
+                  <div class="rule-row" id="rule-special">
+                    <span class="rule-badge">✓</span>
+                    <span>1 special character</span>
+                  </div>
+                </div>
+
+                <div class="terms-row">
+                  <input type="checkbox" id="reg-terms" checked required>
+                  <label for="reg-terms">
+                    I agree to the <a href="#" class="terms-link">Terms &amp; Conditions</a> and <a href="#" class="terms-link">Privacy Policy</a>
+                  </label>
+                </div>
+              </div>
             </div>
-            <div class="check-item">
-              <span class="check-tick">✓</span>
-              <span>Mobile verified</span>
-            </div>
-            <div class="check-item">
-              <span class="check-tick">✓</span>
-              <span>MFA enabled</span>
-            </div>
+
+            <button type="submit" class="btn-solid-blue" id="btn-create-account">
+              Create Account
+            </button>
+          </form>
+
+          <div class="auth-bottom-link">
+            Already have an account? <a href="#" id="link-login-from-reg">Login</a>
           </div>
-
-          <button type="button" class="btn-solid-blue" id="btn-continue-login">
-            Continue to Login
-          </button>
         </div>
-      </div>
 
-      <!-- Global Card Footer -->
-      <div class="global-card-footer">
-        © 2024 SecureID. All rights reserved.
-      </div>
+        <!-- Registration Step 2: Email OTP -->
+        <div id="screen-email-otp" class="screen-view">
+          <div class="center-content">
+            <div class="round-icon-badge blue-badge" id="email-badge-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </div>
+            <h2 class="section-heading">Verify your email</h2>
+            <p class="section-subheading">
+              We have sent a 6-digit code to<br>
+              <strong id="email-target-text">priya.sharma@email.com</strong>
+            </p>
+            <div class="otp-boxes-grid" id="email-otp-grid">
+              <input type="text" class="box-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*">
+              <input type="text" class="box-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*">
+              <input type="text" class="box-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*">
+              <input type="text" class="box-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*">
+              <input type="text" class="box-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*">
+              <input type="text" class="box-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*">
+            </div>
+            <div class="error-feedback-box hidden" id="email-error-box">
+              <div class="err-main-text" id="email-err-main">Incorrect code. Please try again.</div>
+              <div class="err-sub-text" id="email-err-sub">You have 2 attempts left.</div>
+            </div>
+            <div class="timer-line" id="email-timer-wrap">
+              Code expires in <strong id="email-countdown">02:45</strong>
+            </div>
+            <div class="resend-line" id="email-resend-wrap">
+              <button type="button" class="btn-resend-link" id="btn-resend-email" disabled>
+                Resend code <span id="email-cooldown-text">(00:25)</span>
+              </button>
+            </div>
+            <div class="action-btn-wrap">
+              <button type="button" class="btn-solid-blue hidden" id="btn-resend-expired-email">Resend New Code</button>
+              <button type="button" class="btn-solid-blue" id="btn-verify-email">Verify Email</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Registration Step 3: SMS OTP -->
+        <div id="screen-sms-otp" class="screen-view">
+          <div class="center-content">
+            <div class="round-icon-badge green-badge" id="sms-badge-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+            <h2 class="section-heading">Verify your mobile</h2>
+            <p class="section-subheading">
+              We have sent a 6-digit code to<br>
+              <strong id="sms-target-text">+91 98765 43210</strong>
+            </p>
+            <div class="otp-boxes-grid" id="sms-otp-grid">
+              <input type="text" class="box-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*">
+              <input type="text" class="box-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*">
+              <input type="text" class="box-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*">
+              <input type="text" class="box-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*">
+              <input type="text" class="box-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*">
+              <input type="text" class="box-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*">
+            </div>
+            <div class="error-feedback-box hidden" id="sms-error-box">
+              <div class="err-main-text" id="sms-err-main">Incorrect code. Please try again.</div>
+              <div class="err-sub-text" id="sms-err-sub">You have 1 attempt left.</div>
+            </div>
+            <div class="timer-line" id="sms-timer-wrap">
+              Code expires in <strong id="sms-countdown">02:45</strong>
+            </div>
+            <div class="resend-line" id="sms-resend-wrap">
+              <button type="button" class="btn-resend-link" id="btn-resend-sms" disabled>
+                Resend code <span id="sms-cooldown-text">(00:25)</span>
+              </button>
+            </div>
+            <div class="action-btn-wrap">
+              <button type="button" class="btn-solid-blue hidden" id="btn-resend-expired-sms">Resend New Code</button>
+              <button type="button" class="btn-solid-blue" id="btn-verify-sms">Verify Mobile</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Registration Step 4: MFA Setup -->
+        <div id="screen-mfa-options" class="screen-view">
+          <div class="center-content">
+            <div class="round-icon-badge blue-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <h2 class="section-heading">Set up Multi-Factor Auth</h2>
+            <p class="section-subheading">Add an extra layer of security to protect your account.</p>
+            <div class="mfa-options-list">
+              <label class="mfa-option-card selected">
+                <input type="radio" name="mfa-method" value="authenticator" checked>
+                <div class="option-icon-box">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                </div>
+                <div class="option-content">
+                  <div class="option-title">Authenticator App</div>
+                  <div class="option-desc">Google Authenticator / Authy</div>
+                </div>
+                <div class="option-radio-dot"></div>
+              </label>
+            </div>
+            <button type="button" class="btn-solid-blue" id="btn-mfa-continue">Continue</button>
+          </div>
+        </div>
+
+        <!-- Registration Step 5: Success Screen -->
+        <div id="screen-success" class="screen-view">
+          <div class="center-content">
+            <div class="round-icon-badge green-badge-solid">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <h2 class="section-heading">Account created!</h2>
+            <p class="section-subheading">Your account has been created<br>successfully and MFA is enabled.</p>
+            <div class="success-checklist">
+              <div class="check-item"><span class="check-tick">✓</span><span>Email verified</span></div>
+              <div class="check-item"><span class="check-tick">✓</span><span>Mobile verified</span></div>
+              <div class="check-item"><span class="check-tick">✓</span><span>MFA enabled</span></div>
+            </div>
+            <button type="button" class="btn-solid-blue" id="btn-continue-login-from-success">Continue to Login</button>
+          </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- VIEW: AUTHENTICATED DASHBOARD (PART 2)         -->
+        <!-- ============================================== -->
+        <div id="view-dashboard" class="screen-view">
+          <div class="dashboard-wrap">
+            <div class="dashboard-header">
+              <div class="dashboard-user-greeting">
+                <span class="greeting-badge">Authenticated Session</span>
+                <h2>Welcome, <span id="dash-user-name">User</span>!</h2>
+                <p>You are securely logged in to SecureID IAM.</p>
+              </div>
+              <button type="button" class="btn-logout" id="btn-logout">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                <span>Logout</span>
+              </button>
+            </div>
+
+            <!-- Profile Info Cards -->
+            <div class="dash-grid">
+              <div class="dash-card">
+                <div class="dash-card-icon blue">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                </div>
+                <div class="dash-card-info">
+                  <label>Email Address</label>
+                  <strong id="dash-user-email">—</strong>
+                  <span class="badge-tag verified">Verified ✓</span>
+                </div>
+              </div>
+
+              <div class="dash-card">
+                <div class="dash-card-icon green">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div class="dash-card-info">
+                  <label>Multi-Factor Auth</label>
+                  <strong id="dash-user-mfa">Enabled</strong>
+                  <span class="badge-tag mfa-active">Protected ✓</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Interactive JWT Token Tester Widget -->
+            <div class="jwt-tester-box">
+              <div class="jwt-tester-header">
+                <h3>JWT Token &amp; Protected API Tester</h3>
+                <span class="jwt-chip">POST /api/token &amp; GET /api/protected</span>
+              </div>
+              <p class="jwt-desc">
+                Demonstrates session-to-JWT conversion and stateless Bearer token authentication against backend protected endpoints.
+              </p>
+              
+              <div class="jwt-action-row">
+                <button type="button" class="btn-solid-blue" id="btn-generate-jwt">Generate JWT Token</button>
+                <button type="button" class="btn-outline-gray" id="btn-test-protected" disabled>Test Protected Route</button>
+              </div>
+
+              <div class="jwt-terminal-box hidden" id="jwt-terminal">
+                <div class="jwt-terminal-label" id="jwt-terminal-label">JWT Access Token:</div>
+                <pre class="jwt-code-output" id="jwt-code-output"></pre>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Global Card Footer -->
+        <div class="global-card-footer">
+          © 2024 SecureID. All rights reserved.
+        </div>
+
+      </main>
     </div>
   </div>
 
-  <!-- Dialog for Login Notice -->
-  <dialog id="modal-login-notice" class="custom-modal">
+  <!-- Forgot Password Dialog -->
+  <dialog id="modal-forgot-password" class="custom-modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3>SecureID IAM — Part 1</h3>
+        <h3>Reset Password</h3>
       </div>
       <div class="modal-body">
-        <p><strong>Login will be implemented in Part 2.</strong></p>
-        <p>Registration, Email OTP, Mobile SMS OTP, and MFA verification flows are fully verified and active.</p>
+        <p>Enter your email to receive password reset instructions.</p>
+        <div class="form-group" style="margin-top: 1rem; text-align: left;">
+          <label for="forgot-email-input">Email Address</label>
+          <input type="email" id="forgot-email-input" placeholder="user@example.com" style="width: 100%; height: 40px; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 0 0.75rem;">
+        </div>
+        <p class="generic-notice-text" id="forgot-notice-text" style="font-size: 0.8rem; color: #64748b; margin-top: 0.75rem;">
+          If an account exists for this email, password reset instructions will be provided.
+        </p>
       </div>
       <div class="modal-actions">
-        <button type="button" class="btn-solid-blue" id="btn-modal-close">Got it</button>
+        <button type="button" class="btn-solid-blue" id="btn-submit-forgot">Submit Request</button>
+        <button type="button" class="btn-outline-gray" id="btn-close-forgot" style="margin-top: 0.5rem; width: 100%;">Close</button>
       </div>
     </div>
   </dialog>
 
-  <!-- Dev Helper Floating Tool (Collapsible) -->
+  <!-- Dev Helper Toolbar -->
   <aside class="dev-otp-toolbar" id="dev-toolbar">
     <div class="dev-toolbar-bar" id="dev-toolbar-toggle">
       <span class="dev-pulse-dot"></span>
@@ -494,6 +579,7 @@
   <script src="js/api.js"></script>
   <script src="js/validation.js"></script>
   <script src="js/registration.js"></script>
+  <script src="js/auth.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
