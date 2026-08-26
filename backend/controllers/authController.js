@@ -1,5 +1,5 @@
 const prisma = require('../services/prisma');
-const { comparePassword } = require('../utils/hashing');
+const { comparePassword, hashPassword } = require('../utils/hashing');
 const otpService = require('../services/otpService');
 const sessionService = require('../services/sessionService');
 const jwtService = require('../services/jwtService');
@@ -235,6 +235,118 @@ async function sendLoginOtp(req, res, next) {
 }
 
 /**
+ * POST /api/forgot-password
+ */
+async function forgotPassword(req, res, next) {
+  try {
+    const { email } = req.body || {};
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        error: 'VALIDATION_ERROR',
+        message: 'Email address is required.'
+      });
+    }
+
+    const cleanEmail = String(email).trim().toLowerCase();
+    const user = await prisma.user.findUnique({ where: { email: cleanEmail } });
+
+    let challengeId = null;
+    if (user) {
+      const challenge = await otpService.createOtpChallenge({
+        userId: user.id,
+        channel: 'email',
+        recipient: user.email,
+        purpose: 'password-reset'
+      });
+      challengeId = challenge.challengeId;
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'If an account exists with this email, a password reset code has been sent.',
+      challengeId
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * POST /api/reset-password
+ */
+async function resetPassword(req, res, next) {
+  try {
+    const { challengeId, otp, newPassword, confirmPassword } = req.body || {};
+
+    if (!challengeId || !otp || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        error: 'VALIDATION_ERROR',
+        message: 'Challenge ID, OTP, and new password are required.'
+      });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        error: 'PASSWORD_MISMATCH',
+        message: 'Passwords do not match.'
+      });
+    }
+
+    // Complexity validation
+    const hasMinLength = newPassword.length >= 8;
+    const hasUpper = /[A-Z]/.test(newPassword);
+    const hasNum = /[0-9]/.test(newPassword);
+    const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]/.test(newPassword);
+
+    if (!hasMinLength || !hasUpper || !hasNum || !hasSpecial) {
+      return res.status(400).json({
+        success: false,
+        error: 'WEAK_PASSWORD',
+        message: 'Password does not meet complexity requirements.'
+      });
+    }
+
+    const { user } = await otpService.verifyOtpChallenge({
+      challengeId,
+      otp,
+      expectedPurpose: 'password-reset'
+    });
+
+    const newPasswordHash = await hashPassword(newPassword);
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        passwordHash: newPasswordHash,
+        failedLoginAttempts: 0,
+        lockedUntil: null
+      }
+    });
+
+    // Invalidate all active sessions for this user
+    await prisma.session.deleteMany({
+      where: { userId: user.id }
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Password has been reset successfully. Please log in with your new password.'
+    });
+  } catch (error) {
+    const statusCode = error.statusCode || 400;
+    return res.status(statusCode).json({
+      success: false,
+      error: error.code || 'RESET_FAILED',
+      message: error.message || 'Password reset failed.',
+      attemptsRemaining: error.attemptsRemaining
+    });
+  }
+}
+
+/**
  * GET /api/me
  */
 async function getMe(req, res) {
@@ -304,6 +416,8 @@ module.exports = {
   login,
   verifyLoginOtp,
   sendLoginOtp,
+  forgotPassword,
+  resetPassword,
   getMe,
   logout,
   issueToken,

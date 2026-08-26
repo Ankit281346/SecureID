@@ -1,5 +1,5 @@
 /**
- * Main Application Entry & UI Orchestration (Part 1 + Part 2)
+ * Main Application Entry & UI Orchestration (Part 1 + Part 2 + Password Reset)
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const btnSubmitLogin = document.getElementById('btn-submit-login');
 
   // Toggle login password visibility
-  if (toggleLoginPassword) {
+  if (toggleLoginPassword && loginPasswordInput) {
     toggleLoginPassword.addEventListener('click', () => {
       const isPwd = loginPasswordInput.type === 'password';
       loginPasswordInput.type = isPwd ? 'text' : 'password';
@@ -203,7 +203,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Resend Login OTP
   const handleResendLoginOtp = async () => {
-    btnResendLoginOtp.disabled = true;
+    if (btnResendLoginOtp) btnResendLoginOtp.disabled = true;
     try {
       const res = await api.sendLoginOtp({
         challengeId: authFlow.state.challengeId
@@ -216,7 +216,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       authFlow.updateDevPanel();
     } catch (err) {
       alert(err.message || 'Failed to resend code.');
-      btnResendLoginOtp.disabled = false;
+      if (btnResendLoginOtp) btnResendLoginOtp.disabled = false;
     }
   };
 
@@ -439,7 +439,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   const handleResendEmailReg = async () => {
-    btnResendEmail.disabled = true;
+    if (btnResendEmail) btnResendEmail.disabled = true;
     try {
       const res = await api.sendEmailOtp({
         challengeId: flow.state.challengeId,
@@ -454,7 +454,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       flow.updateDevPanel();
     } catch (err) {
       alert(err.message || 'Failed to resend code.');
-      btnResendEmail.disabled = false;
+      if (btnResendEmail) btnResendEmail.disabled = false;
     }
   };
 
@@ -500,7 +500,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   const handleResendSmsReg = async () => {
-    btnResendSms.disabled = true;
+    if (btnResendSms) btnResendSms.disabled = true;
     try {
       const res = await api.sendSmsOtp({
         challengeId: flow.state.challengeId,
@@ -515,7 +515,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       flow.updateDevPanel();
     } catch (err) {
       alert(err.message || 'Failed to resend code.');
-      btnResendSms.disabled = false;
+      if (btnResendSms) btnResendSms.disabled = false;
     }
   };
 
@@ -529,16 +529,83 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ------------------------------------------------------------------------
-  // 5. Forgot Password Dialog
+  // 5. "Didn't receive the code?" Assistance Modal
+  // ------------------------------------------------------------------------
+  const modalOtpHelp = document.getElementById('modal-otp-help');
+  const btnCloseOtpHelp = document.getElementById('btn-close-otp-help');
+  const btnModalTriggerResend = document.getElementById('btn-modal-trigger-resend');
+
+  const openOtpHelpModal = (e) => {
+    if (e) e.preventDefault();
+    if (modalOtpHelp) modalOtpHelp.showModal();
+  };
+
+  ['link-login-mfa-help', 'link-reg-email-help', 'link-reg-sms-help'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('click', openOtpHelpModal);
+  });
+
+  if (btnCloseOtpHelp && modalOtpHelp) {
+    btnCloseOtpHelp.addEventListener('click', () => modalOtpHelp.close());
+  }
+
+  if (btnModalTriggerResend && modalOtpHelp) {
+    btnModalTriggerResend.addEventListener('click', async () => {
+      modalOtpHelp.close();
+      const currentActive = document.querySelector('.screen-view.active');
+      if (currentActive) {
+        if (currentActive.id === 'view-login-mfa-otp') {
+          await handleResendLoginOtp();
+        } else if (currentActive.id === 'screen-email-otp') {
+          await handleResendEmailReg();
+        } else if (currentActive.id === 'screen-sms-otp') {
+          await handleResendSmsReg();
+        }
+      }
+    });
+  }
+
+  // ------------------------------------------------------------------------
+  // 6. Complete Multi-Step Forgot Password Flow
   // ------------------------------------------------------------------------
   const linkForgotPassword = document.getElementById('link-forgot-password');
   const modalForgotPassword = document.getElementById('modal-forgot-password');
   const btnCloseForgot = document.getElementById('btn-close-forgot');
-  const btnSubmitForgot = document.getElementById('btn-submit-forgot');
+
+  const forgotStep1 = document.getElementById('forgot-step-1');
+  const forgotStep2 = document.getElementById('forgot-step-2');
+  const forgotStep3 = document.getElementById('forgot-step-3');
+
+  const forgotEmailInput = document.getElementById('forgot-email-input');
+  const forgotEmailError = document.getElementById('forgot-email-error');
+  const btnForgotSendOtp = document.getElementById('btn-forgot-send-otp');
+
+  const forgotOtpInput = document.getElementById('forgot-otp-input');
+  const forgotNewPassword = document.getElementById('forgot-new-password');
+  const forgotConfirmPassword = document.getElementById('forgot-confirm-password');
+  const forgotResetError = document.getElementById('forgot-reset-error');
+  const btnForgotSubmitReset = document.getElementById('btn-forgot-submit-reset');
+  const btnForgotDone = document.getElementById('btn-forgot-done');
+
+  let activeResetChallengeId = null;
+
+  const resetForgotModalState = () => {
+    if (forgotStep1) forgotStep1.classList.remove('hidden');
+    if (forgotStep2) forgotStep2.classList.add('hidden');
+    if (forgotStep3) forgotStep3.classList.add('hidden');
+    if (forgotEmailError) forgotEmailError.textContent = '';
+    if (forgotResetError) forgotResetError.textContent = '';
+    if (forgotEmailInput) forgotEmailInput.value = '';
+    if (forgotOtpInput) forgotOtpInput.value = '';
+    if (forgotNewPassword) forgotNewPassword.value = '';
+    if (forgotConfirmPassword) forgotConfirmPassword.value = '';
+    activeResetChallengeId = null;
+  };
 
   if (linkForgotPassword && modalForgotPassword) {
     linkForgotPassword.addEventListener('click', (e) => {
       e.preventDefault();
+      resetForgotModalState();
       modalForgotPassword.showModal();
     });
   }
@@ -549,15 +616,106 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  if (btnSubmitForgot && modalForgotPassword) {
-    btnSubmitForgot.addEventListener('click', () => {
-      alert('If an account exists for this email, password reset instructions will be provided.');
+  // Step 1: Send Password Reset Code
+  if (btnForgotSendOtp) {
+    btnForgotSendOtp.addEventListener('click', async () => {
+      if (forgotEmailError) forgotEmailError.textContent = '';
+      const email = forgotEmailInput.value.trim();
+
+      if (!email) {
+        if (forgotEmailError) forgotEmailError.textContent = 'Please enter your email address.';
+        return;
+      }
+
+      btnForgotSendOtp.disabled = true;
+      btnForgotSendOtp.textContent = 'Sending Code...';
+
+      try {
+        const res = await api.forgotPassword({ email });
+        activeResetChallengeId = res.challengeId;
+
+        // Transition to Step 2
+        forgotStep1.classList.add('hidden');
+        forgotStep2.classList.remove('hidden');
+        document.getElementById('forgot-modal-title').textContent = 'Enter Reset Code';
+        document.getElementById('forgot-modal-subtitle').textContent = `Enter the 6-digit code sent to ${email} and choose a new password.`;
+
+        // Update dev toolbar with reset code if available
+        if (activeResetChallengeId) {
+          const devData = await api.getDevOtp(activeResetChallengeId);
+          if (devData && devData.otp) {
+            const devCode = document.getElementById('dev-otp-code');
+            if (devCode) devCode.textContent = devData.otp;
+          }
+        }
+      } catch (err) {
+        if (forgotEmailError) forgotEmailError.textContent = err.message || 'Failed to send reset code.';
+      } finally {
+        btnForgotSendOtp.disabled = false;
+        btnForgotSendOtp.textContent = 'Send Reset Code';
+      }
+    });
+  }
+
+  // Step 2: Submit Reset Code & New Password
+  if (btnForgotSubmitReset) {
+    btnForgotSubmitReset.addEventListener('click', async () => {
+      if (forgotResetError) forgotResetError.textContent = '';
+
+      const otp = forgotOtpInput.value.trim();
+      const newPassword = forgotNewPassword.value;
+      const confirmPassword = forgotConfirmPassword.value;
+
+      if (!otp || otp.length !== 6) {
+        if (forgotResetError) forgotResetError.textContent = 'Please enter a valid 6-digit reset code.';
+        return;
+      }
+
+      if (!newPassword || newPassword.length < 8) {
+        if (forgotResetError) forgotResetError.textContent = 'Password must be at least 8 characters long.';
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        if (forgotResetError) forgotResetError.textContent = 'Passwords do not match.';
+        return;
+      }
+
+      btnForgotSubmitReset.disabled = true;
+      btnForgotSubmitReset.textContent = 'Updating Password...';
+
+      try {
+        await api.resetPassword({
+          challengeId: activeResetChallengeId,
+          otp,
+          newPassword,
+          confirmPassword
+        });
+
+        // Transition to Step 3 (Success)
+        forgotStep2.classList.add('hidden');
+        forgotStep3.classList.remove('hidden');
+        document.getElementById('forgot-modal-title').textContent = 'Success';
+        document.getElementById('forgot-modal-subtitle').textContent = '';
+      } catch (err) {
+        if (forgotResetError) forgotResetError.textContent = err.message || 'Password reset failed.';
+      } finally {
+        btnForgotSubmitReset.disabled = false;
+        btnForgotSubmitReset.textContent = 'Update Password';
+      }
+    });
+  }
+
+  // Step 3: Back to Login
+  if (btnForgotDone && modalForgotPassword) {
+    btnForgotDone.addEventListener('click', () => {
       modalForgotPassword.close();
+      authFlow.goToView('view-login');
     });
   }
 
   // ------------------------------------------------------------------------
-  // 6. Dev Toolbar Autofill
+  // 7. Dev Toolbar Autofill
   // ------------------------------------------------------------------------
   const devToolbarToggle = document.getElementById('dev-toolbar-toggle');
   const btnAutofillOtp = document.getElementById('btn-autofill-otp');
@@ -573,10 +731,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (btnAutofillOtp) {
     btnAutofillOtp.addEventListener('click', async () => {
-      const challengeId = authFlow.state.challengeId || flow.state.challengeId;
+      const challengeId = activeResetChallengeId || authFlow.state.challengeId || flow.state.challengeId;
       if (!challengeId) return;
       const data = await api.getDevOtp(challengeId);
       if (data && data.otp) {
+        if (modalForgotPassword && modalForgotPassword.open && !forgotStep2.classList.contains('hidden')) {
+          if (forgotOtpInput) forgotOtpInput.value = data.otp;
+          return;
+        }
+
         let gridId = 'login-mfa-otp-grid';
         if (flow.state.currentStep === 'screen-email-otp') gridId = 'email-otp-grid';
         else if (flow.state.currentStep === 'screen-sms-otp') gridId = 'sms-otp-grid';

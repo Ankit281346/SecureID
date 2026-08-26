@@ -1,5 +1,5 @@
 /**
- * API Client for SecureID IAM (Part 1 + Part 2)
+ * API Client for SecureID IAM (Part 1 + Part 2 + Password Reset)
  */
 
 const API_BASE = '/api';
@@ -153,6 +153,44 @@ const api = {
     const data = await response.json();
     if (!response.ok) {
       const err = new Error(data.message || 'Failed to resend login OTP.');
+      err.data = data;
+      err.status = response.status;
+      throw err;
+    }
+    return data;
+  },
+
+  /**
+   * Forgot Password request
+   */
+  async forgotPassword(payload) {
+    const response = await fetch(`${API_BASE}/forgot-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      const err = new Error(data.message || 'Failed to process request.');
+      err.data = data;
+      err.status = response.status;
+      throw err;
+    }
+    return data;
+  },
+
+  /**
+   * Reset Password submission
+   */
+  async resetPassword(payload) {
+    const response = await fetch(`${API_BASE}/reset-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      const err = new Error(data.message || 'Failed to reset password.');
       err.data = data;
       err.status = response.status;
       throw err;

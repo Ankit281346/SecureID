@@ -5,10 +5,12 @@ const authController = require('../controllers/authController');
 const { requireAuth } = require('../middleware/authMiddleware');
 const { requireJWT } = require('../middleware/jwtMiddleware');
 
-// Public Login Endpoints
+// Public Login & Password Reset Endpoints
 router.post('/login', authController.login);
 router.post('/verify-login-otp', authController.verifyLoginOtp);
 router.post('/send-login-otp', authController.sendLoginOtp);
+router.post('/forgot-password', authController.forgotPassword);
+router.post('/reset-password', authController.resetPassword);
 
 // Session-Protected Endpoints
 router.get('/me', requireAuth, authController.getMe);

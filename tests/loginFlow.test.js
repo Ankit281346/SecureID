@@ -1,5 +1,5 @@
 /**
- * Automated Test Suite for IAM Login, MFA, Session, and JWT Flow (Part 2)
+ * Automated Test Suite for IAM Login, MFA, Session, JWT & Password Reset Flow (Part 2)
  */
 
 const assert = require('assert');
@@ -43,7 +43,7 @@ async function request(endpoint, options = {}) {
 }
 
 async function runTests() {
-  console.log('🧪 Starting IAM Login, MFA, Session & JWT Flow Automated Tests (Part 2)...\n');
+  console.log('🧪 Starting IAM Login, MFA, Session, JWT & Password Reset Automated Tests...\n');
 
   server = http.createServer(app);
   await new Promise((resolve) => {
@@ -338,9 +338,55 @@ async function runTests() {
       console.log('  ✓ Logout invalidated session and revoked /api/me access');
     }
 
-    console.log('\n🎉 ALL 15 PART 2 TEST SUITES PASSED PERFECTLY!\n');
+    // Test 16: POST /api/forgot-password generates password reset challenge
+    console.log('Test 16: POST /api/forgot-password generates password reset OTP');
+    let resetChallengeId;
+    {
+      const { status, data } = await request('/api/forgot-password', {
+        method: 'POST',
+        body: { email: 'priya.sharma@example.com' }
+      });
+      assert.strictEqual(status, 200);
+      assert.strictEqual(data.success, true);
+      assert.ok(data.challengeId);
+      resetChallengeId = data.challengeId;
+      console.log('  ✓ Password reset challenge generated:', resetChallengeId);
+    }
+
+    // Test 17: POST /api/reset-password updates user password hash
+    console.log('Test 17: POST /api/reset-password updates password');
+    {
+      const { data: testOtpData } = await request(`/api/test/otp/${resetChallengeId}`);
+      const resetOtp = testOtpData.otp;
+
+      const { status, data } = await request('/api/reset-password', {
+        method: 'POST',
+        body: {
+          challengeId: resetChallengeId,
+          otp: resetOtp,
+          newPassword: 'BrandNewPassword999!',
+          confirmPassword: 'BrandNewPassword999!'
+        }
+      });
+      assert.strictEqual(status, 200);
+      assert.strictEqual(data.success, true);
+
+      // Verify user can now log in with the new password
+      const { status: loginStatus, data: loginData } = await request('/api/login', {
+        method: 'POST',
+        body: {
+          email: 'priya.sharma@example.com',
+          password: 'BrandNewPassword999!'
+        }
+      });
+      assert.strictEqual(loginStatus, 200);
+      assert.strictEqual(loginData.success, true);
+      console.log('  ✓ Password updated and successfully verified with new login');
+    }
+
+    console.log('\n🎉 ALL 17 TEST SUITES PASSED PERFECTLY!\n');
   } catch (error) {
-    console.error('\n❌ Part 2 Test Suite Failed:', error);
+    console.error('\n❌ Test Suite Failed:', error);
     process.exitCode = 1;
   } finally {
     if (server) {

@@ -13,12 +13,14 @@ const devOtpStore = new Map();
  * @param {string} channel 'email' | 'sms'
  * @param {string} recipient
  * @param {string} otp
- * @param {string} purpose 'registration' | 'login'
+ * @param {string} purpose 'registration' | 'login' | 'password-reset'
  */
 function logSimulatedDelivery(channel, recipient, otp, purpose = 'registration') {
   let header;
   if (purpose === 'login') {
     header = channel === 'email' ? '[SIMULATED LOGIN EMAIL]' : '[SIMULATED LOGIN SMS]';
+  } else if (purpose === 'password-reset') {
+    header = '[SIMULATED PASSWORD RESET EMAIL]';
   } else {
     header = channel === 'email' ? '[SIMULATED EMAIL]' : '[SIMULATED SMS]';
   }
@@ -37,7 +39,7 @@ function logSimulatedDelivery(channel, recipient, otp, purpose = 'registration')
  * @param {string} params.userId
  * @param {'email'|'sms'} params.channel
  * @param {string} params.recipient Email address or Phone number
- * @param {string} [params.purpose='registration'] 'registration' | 'login'
+ * @param {string} [params.purpose='registration'] 'registration' | 'login' | 'password-reset'
  * @returns {Promise<{challengeId: string, expiresAt: Date}>}
  */
 async function createOtpChallenge({ userId, channel, recipient, purpose = 'registration' }) {
