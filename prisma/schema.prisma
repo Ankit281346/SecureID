@@ -3,12 +3,12 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id                  String         @id @default(uuid())
+  id                  String         @id @default(auto()) @map("_id") @db.ObjectId
   name                String
   email               String         @unique
   phone               String         @unique
@@ -25,13 +25,13 @@ model User {
 }
 
 model OtpChallenge {
-  id        String   @id @default(uuid())
-  userId    String
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  channel   String   // "email" | "sms"
+  channel   String   // "email" | "sms" | "authenticator"
   purpose   String   @default("registration") // "registration" | "login" | "password-reset"
   otpHash   String
-  otpCode   String?  // Stored for serverless Vercel demo retrieval
+  otpCode   String?
   expiresAt DateTime
   attempts  Int      @default(0)
   verified  Boolean  @default(false)
@@ -39,8 +39,8 @@ model OtpChallenge {
 }
 
 model Session {
-  id        String   @id @default(uuid())
-  userId    String
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   expiresAt DateTime
   createdAt DateTime @default(now())
