@@ -270,17 +270,24 @@ class RegistrationFlow {
     if (resendExpBtn) resendExpBtn.classList.remove('hidden');
   }
 
-  async updateDevPanel() {
+  async updateDevPanel(explicitOtp) {
     const codeEl = document.getElementById('dev-otp-code');
     const emailChipVal = document.getElementById('reg-email-sim-val');
     const smsChipVal = document.getElementById('reg-sms-sim-val');
-    if (!this.state.challengeId) return;
 
-    const data = await window.api.getDevOtp(this.state.challengeId);
-    if (data && data.otp) {
-      if (codeEl) codeEl.textContent = data.otp;
-      if (emailChipVal) emailChipVal.textContent = data.otp;
-      if (smsChipVal) smsChipVal.textContent = data.otp;
+    let otp = explicitOtp || this.state.devOtp;
+    if (!otp && this.state.challengeId) {
+      try {
+        const data = await window.api.getDevOtp(this.state.challengeId);
+        if (data && data.otp) otp = data.otp;
+      } catch (e) {}
+    }
+
+    if (otp) {
+      this.state.devOtp = otp;
+      if (codeEl) codeEl.textContent = otp;
+      if (emailChipVal) emailChipVal.textContent = otp;
+      if (smsChipVal) smsChipVal.textContent = otp;
     } else {
       if (codeEl) codeEl.textContent = '— — — — — —';
       if (emailChipVal) emailChipVal.textContent = 'Check Terminal Logs';

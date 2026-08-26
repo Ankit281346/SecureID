@@ -29,8 +29,9 @@ model OtpChallenge {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   channel   String   // "email" | "sms"
-  purpose   String   @default("registration") // "registration" | "login"
+  purpose   String   @default("registration") // "registration" | "login" | "password-reset"
   otpHash   String
+  otpCode   String?  // Stored for serverless Vercel demo retrieval
   expiresAt DateTime
   attempts  Int      @default(0)
   verified  Boolean  @default(false)

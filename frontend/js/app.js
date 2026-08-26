@@ -108,11 +108,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (res.mfaRequired) {
           authFlow.state.challengeId = res.challengeId;
+          authFlow.state.devOtp = res.devOtp;
           authFlow.state.email = res.email || email;
           authFlow.state.rememberMe = rememberMe;
 
           // Transition to Choose MFA Method Screen
           authFlow.goToView('view-login-mfa-choose');
+          authFlow.updateDevPanel(res.devOtp);
         } else if (res.authenticated) {
           await authFlow.loadDashboard();
         }
@@ -209,11 +211,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         challengeId: authFlow.state.challengeId
       });
       authFlow.state.challengeId = res.challengeId;
+      authFlow.state.devOtp = res.devOtp;
       authFlow.clearLoginOtpInputs();
       authFlow.hideMfaError();
       authFlow.startExpiryTimer();
       authFlow.startResendCooldown();
-      authFlow.updateDevPanel();
+      authFlow.updateDevPanel(res.devOtp);
     } catch (err) {
       alert(err.message || 'Failed to resend code.');
       if (btnResendLoginOtp) btnResendLoginOtp.disabled = false;
@@ -384,11 +387,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         flow.state.userId = res.userId;
         flow.state.challengeId = res.challengeId;
+        flow.state.devOtp = res.devOtp;
         flow.state.email = res.email;
         flow.state.phone = `+91 ${rawPhone.slice(0, 5)} ${rawPhone.slice(5)}`;
         flow.state.expiresAt = res.expiresAt;
 
         flow.goToScreen('screen-email-otp');
+        flow.updateDevPanel(res.devOtp);
       } catch (err) {
         alert(err.message || 'Registration failed.');
       } finally {
@@ -415,8 +420,10 @@ document.addEventListener('DOMContentLoaded', async () => {
           otp
         });
         flow.state.challengeId = res.challengeId;
+        flow.state.devOtp = res.devOtp;
         flow.state.expiresAt = res.expiresAt;
         flow.goToScreen('screen-sms-otp');
+        flow.updateDevPanel(res.devOtp);
       } catch (err) {
         const data = err.data || {};
         if (data.code === 'MAX_ATTEMPTS_EXCEEDED' || err.status === 429) {
@@ -446,12 +453,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         userId: flow.state.userId
       });
       flow.state.challengeId = res.challengeId;
+      flow.state.devOtp = res.devOtp;
       flow.state.expiresAt = res.expiresAt;
       flow.clearOtpInputs('email-otp-grid');
       flow.hideError('email');
       flow.startExpiryTimer('email');
       flow.startResendCooldown('email');
-      flow.updateDevPanel();
+      flow.updateDevPanel(res.devOtp);
     } catch (err) {
       alert(err.message || 'Failed to resend code.');
       if (btnResendEmail) btnResendEmail.disabled = false;
@@ -507,12 +515,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         userId: flow.state.userId
       });
       flow.state.challengeId = res.challengeId;
+      flow.state.devOtp = res.devOtp;
       flow.state.expiresAt = res.expiresAt;
       flow.clearOtpInputs('sms-otp-grid');
       flow.hideError('sms');
       flow.startExpiryTimer('sms');
       flow.startResendCooldown('sms');
-      flow.updateDevPanel();
+      flow.updateDevPanel(res.devOtp);
     } catch (err) {
       alert(err.message || 'Failed to resend code.');
       if (btnResendSms) btnResendSms.disabled = false;
@@ -640,10 +649,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('forgot-modal-title').textContent = 'Enter Reset Code';
         document.getElementById('forgot-modal-subtitle').textContent = `Enter the 6-digit code sent to ${email} and choose a new password.`;
 
-        // Update dev toolbar with reset code if available
-        if (activeResetChallengeId) {
+        // Update chips & dev toolbar
+        const resetOtp = res.devOtp;
+        if (resetOtp) {
+          const forgotChipVal = document.getElementById('forgot-sim-val');
+          if (forgotChipVal) forgotChipVal.textContent = resetOtp;
+          const devCode = document.getElementById('dev-otp-code');
+          if (devCode) devCode.textContent = resetOtp;
+        } else if (activeResetChallengeId) {
           const devData = await api.getDevOtp(activeResetChallengeId);
           if (devData && devData.otp) {
+            const forgotChipVal = document.getElementById('forgot-sim-val');
+            if (forgotChipVal) forgotChipVal.textContent = devData.otp;
             const devCode = document.getElementById('dev-otp-code');
             if (devCode) devCode.textContent = devData.otp;
           }

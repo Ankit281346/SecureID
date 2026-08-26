@@ -296,15 +296,22 @@ class AuthFlow {
     }
   }
 
-  async updateDevPanel() {
+  async updateDevPanel(explicitOtp) {
     const codeEl = document.getElementById('dev-otp-code');
     const loginChipVal = document.getElementById('login-sim-val');
-    if (!this.state.challengeId) return;
 
-    const data = await window.api.getDevOtp(this.state.challengeId);
-    if (data && data.otp) {
-      if (codeEl) codeEl.textContent = data.otp;
-      if (loginChipVal) loginChipVal.textContent = data.otp;
+    let otp = explicitOtp || this.state.devOtp;
+    if (!otp && this.state.challengeId) {
+      try {
+        const data = await window.api.getDevOtp(this.state.challengeId);
+        if (data && data.otp) otp = data.otp;
+      } catch (e) {}
+    }
+
+    if (otp) {
+      this.state.devOtp = otp;
+      if (codeEl) codeEl.textContent = otp;
+      if (loginChipVal) loginChipVal.textContent = otp;
     } else {
       if (codeEl) codeEl.textContent = '— — — — — —';
       if (loginChipVal) loginChipVal.textContent = 'Check Terminal Logs';

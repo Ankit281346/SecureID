@@ -127,6 +127,7 @@ async function login(req, res, next) {
         mfaRequired: true,
         method: 'email',
         challengeId: challenge.challengeId,
+        devOtp: challenge.otp,
         email: user.email,
         rememberMe: !!rememberMe
       });
@@ -227,6 +228,7 @@ async function sendLoginOtp(req, res, next) {
       success: true,
       message: 'A new verification code has been sent.',
       challengeId: newChallenge.challengeId,
+      devOtp: newChallenge.otp,
       expiresAt: newChallenge.expiresAt.toISOString()
     });
   } catch (error) {
@@ -252,6 +254,7 @@ async function forgotPassword(req, res, next) {
     const user = await prisma.user.findUnique({ where: { email: cleanEmail } });
 
     let challengeId = null;
+    let devOtp = null;
     if (user) {
       const challenge = await otpService.createOtpChallenge({
         userId: user.id,
@@ -260,12 +263,14 @@ async function forgotPassword(req, res, next) {
         purpose: 'password-reset'
       });
       challengeId = challenge.challengeId;
+      devOtp = challenge.otp;
     }
 
     return res.status(200).json({
       success: true,
       message: 'If an account exists with this email, a password reset code has been sent.',
-      challengeId
+      challengeId,
+      devOtp
     });
   } catch (error) {
     next(error);

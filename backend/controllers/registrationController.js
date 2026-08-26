@@ -69,6 +69,7 @@ async function register(req, res, next) {
       email: user.email,
       phone: user.phone,
       challengeId: challenge.challengeId,
+      devOtp: challenge.otp,
       expiresAt: challenge.expiresAt.toISOString()
     });
   } catch (error) {
@@ -127,6 +128,7 @@ async function sendEmailOtp(req, res, next) {
       success: true,
       message: 'New Email OTP sent successfully.',
       challengeId: challenge.challengeId,
+      devOtp: challenge.otp,
       expiresAt: challenge.expiresAt.toISOString()
     });
   } catch (error) {
@@ -176,6 +178,7 @@ async function verifyEmailOtp(req, res, next) {
       phone: updatedUser.phone,
       maskedPhone: updatedUser.phone,
       challengeId: smsChallenge.challengeId,
+      devOtp: smsChallenge.otp,
       expiresAt: smsChallenge.expiresAt.toISOString()
     });
   } catch (error) {
@@ -234,6 +237,7 @@ async function sendSmsOtp(req, res, next) {
       success: true,
       message: 'New SMS OTP sent successfully.',
       challengeId: challenge.challengeId,
+      devOtp: challenge.otp,
       expiresAt: challenge.expiresAt.toISOString()
     });
   } catch (error) {
@@ -294,8 +298,8 @@ async function verifySmsOtp(req, res, next) {
  * GET /api/test/otp/:challengeId
  * Test/Demo endpoint to retrieve simulated OTP
  */
-function getTestOtp(req, res) {
-  if (process.env.NODE_ENV === 'production' && process.env.ENABLE_DEV_OTP !== 'true') {
+async function getTestOtp(req, res) {
+  if (process.env.NODE_ENV === 'production' && process.env.ENABLE_DEV_OTP !== 'true' && !process.env.VERCEL) {
     return res.status(403).json({
       success: false,
       message: 'Test OTP retrieval is disabled in production.',
@@ -304,7 +308,7 @@ function getTestOtp(req, res) {
   }
 
   const { challengeId } = req.params;
-  const otpData = otpService.getDevOtp(challengeId);
+  const otpData = await otpService.getDevOtp(challengeId);
 
   if (!otpData) {
     return res.status(404).json({

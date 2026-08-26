@@ -5,7 +5,7 @@ const { hashOtp, verifyOtpHash } = require('../utils/hashing');
 const OTP_EXPIRY_MS = 5 * 60 * 1000; // 5 minutes
 const MAX_ATTEMPTS = 5;
 
-// In-memory store for development / demonstration retrieval
+// In-memory store for fast local retrieval
 const devOtpStore = new Map();
 
 /**
@@ -40,7 +40,7 @@ function logSimulatedDelivery(channel, recipient, otp, purpose = 'registration')
  * @param {'email'|'sms'} params.channel
  * @param {string} params.recipient Email address or Phone number
  * @param {string} [params.purpose='registration'] 'registration' | 'login' | 'password-reset'
- * @returns {Promise<{challengeId: string, expiresAt: Date}>}
+ * @returns {Promise<{challengeId: string, otp: string, expiresAt: Date}>}
  */
 async function createOtpChallenge({ userId, channel, recipient, purpose = 'registration' }) {
   // Invalidate or supersede existing unverified challenges for this user, channel, and purpose
@@ -66,13 +66,14 @@ async function createOtpChallenge({ userId, channel, recipient, purpose = 'regis
       channel,
       purpose,
       otpHash,
+      otpCode: otp, // Persisted for Vercel/serverless test & demo retrieval
       expiresAt,
       attempts: 0,
       verified: false
     }
   });
 
-  // Store in simulation store for demo & testing retrieval
+  // Store in memory for immediate access
   devOtpStore.set(challenge.id, {
     challengeId: challenge.id,
     channel,
@@ -86,6 +87,7 @@ async function createOtpChallenge({ userId, channel, recipient, purpose = 'regis
 
   return {
     challengeId: challenge.id,
+    otp,
     expiresAt
   };
 }
@@ -183,7 +185,7 @@ async function verifyOtpChallenge({ challengeId, otp, expectedPurpose }) {
     include: { user: true }
   });
 
-  // Clean up in-memory simulation store
+  // Clean up in-memory store
   devOtpStore.delete(challenge.id);
 
   return {
@@ -193,12 +195,35 @@ async function verifyOtpChallenge({ challengeId, otp, expectedPurpose }) {
 }
 
 /**
- * Retrieve test OTP in simulation mode
+ * Retrieve test OTP in simulation mode (supports serverless persistence)
  * @param {string} challengeId
- * @returns {Object|null}
+ * @returns {Promise<Object|null>}
  */
-function getDevOtp(challengeId) {
-  return devOtpStore.get(challengeId) || null;
+async function getDevOtp(challengeId) {
+  // Check in-memory store first
+  const memoryOtp = devOtpStore.get(challengeId);
+  if (memoryOtp) return memoryOtp;
+
+  // Fallback to database for serverless Vercel multi-instance support
+  try {
+    const challenge = await prisma.otpChallenge.findUnique({
+      where: { id: challengeId }
+    });
+
+    if (challenge && !challenge.verified && challenge.otpCode) {
+      return {
+        challengeId: challenge.id,
+        channel: challenge.channel,
+        purpose: challenge.purpose,
+        otp: challenge.otpCode,
+        expiresAt: challenge.expiresAt.toISOString()
+      };
+    }
+  } catch (err) {
+    console.error('Error fetching OTP from DB:', err);
+  }
+
+  return null;
 }
 
 module.exports = {
