@@ -194,7 +194,7 @@ async function verifyLoginOtp(req, res, next) {
  */
 async function sendLoginOtp(req, res, next) {
   try {
-    const { challengeId } = req.body || {};
+    const { challengeId, channel } = req.body || {};
 
     if (!challengeId) {
       return res.status(400).json({
@@ -217,16 +217,27 @@ async function sendLoginOtp(req, res, next) {
       });
     }
 
+    const targetChannel = channel || existingChallenge.channel || 'email';
+    let recipient = existingChallenge.user.email;
+    if (targetChannel === 'sms') {
+      recipient = existingChallenge.user.phone;
+    } else if (targetChannel === 'authenticator') {
+      recipient = existingChallenge.user.name || existingChallenge.user.email;
+    }
+
     const newChallenge = await otpService.createOtpChallenge({
       userId: existingChallenge.user.id,
-      channel: existingChallenge.channel || 'email',
-      recipient: existingChallenge.user.email,
+      channel: targetChannel,
+      recipient,
       purpose: 'login'
     });
 
     return res.status(200).json({
       success: true,
       message: 'A new verification code has been sent.',
+      method: targetChannel,
+      email: existingChallenge.user.email,
+      phone: existingChallenge.user.phone,
       challengeId: newChallenge.challengeId,
       devOtp: newChallenge.otp,
       expiresAt: newChallenge.expiresAt.toISOString()

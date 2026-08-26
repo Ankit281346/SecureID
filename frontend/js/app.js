@@ -149,8 +149,29 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   if (btnLoginMfaContinue) {
-    btnLoginMfaContinue.addEventListener('click', () => {
-      authFlow.goToView('view-login-mfa-otp');
+    btnLoginMfaContinue.addEventListener('click', async () => {
+      const selectedMethod = authFlow.state.method || 'email';
+      btnLoginMfaContinue.disabled = true;
+      btnLoginMfaContinue.textContent = 'Preparing...';
+
+      try {
+        const res = await api.sendLoginOtp({
+          challengeId: authFlow.state.challengeId,
+          channel: selectedMethod
+        });
+        authFlow.state.challengeId = res.challengeId;
+        authFlow.state.devOtp = res.devOtp;
+        if (res.phone) authFlow.state.phone = res.phone;
+        if (res.email) authFlow.state.email = res.email;
+
+        authFlow.goToView('view-login-mfa-otp');
+        authFlow.updateDevPanel(res.devOtp);
+      } catch (err) {
+        alert(err.message || 'Failed to switch verification method.');
+      } finally {
+        btnLoginMfaContinue.disabled = false;
+        btnLoginMfaContinue.textContent = 'Continue';
+      }
     });
   }
 
@@ -208,7 +229,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (btnResendLoginOtp) btnResendLoginOtp.disabled = true;
     try {
       const res = await api.sendLoginOtp({
-        challengeId: authFlow.state.challengeId
+        challengeId: authFlow.state.challengeId,
+        channel: authFlow.state.method || 'email'
       });
       authFlow.state.challengeId = res.challengeId;
       authFlow.state.devOtp = res.devOtp;

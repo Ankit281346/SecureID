@@ -17,7 +17,9 @@ const devOtpStore = new Map();
  */
 function logSimulatedDelivery(channel, recipient, otp, purpose = 'registration') {
   let header;
-  if (purpose === 'login') {
+  if (channel === 'authenticator') {
+    header = '[SIMULATED AUTHENTICATOR APP CODE]';
+  } else if (purpose === 'login') {
     header = channel === 'email' ? '[SIMULATED LOGIN EMAIL]' : '[SIMULATED LOGIN SMS]';
   } else if (purpose === 'password-reset') {
     header = '[SIMULATED PASSWORD RESET EMAIL]';
