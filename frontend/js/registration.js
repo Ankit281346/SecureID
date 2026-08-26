@@ -7,7 +7,7 @@ class RegistrationFlow {
     this.state = {
       userId: null,
       challengeId: null,
-      currentStep: 'register',
+      currentStep: 'view-register',
       email: 'priya.sharma@email.com',
       phone: '+91 98765 43210',
       expiresAt: null,
@@ -22,7 +22,7 @@ class RegistrationFlow {
   }
 
   initOtpGrids() {
-    ['email-otp-grid', 'sms-otp-grid', 'mfa-otp-grid'].forEach(gridId => {
+    ['email-otp-grid', 'sms-otp-grid'].forEach(gridId => {
       const container = document.getElementById(gridId);
       if (!container) return;
 
@@ -101,14 +101,21 @@ class RegistrationFlow {
    */
   goToScreen(screenId) {
     this.state.currentStep = screenId;
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.screen-view').forEach(s => s.classList.remove('active'));
 
     const activeEl = document.getElementById(screenId);
     if (activeEl) activeEl.classList.add('active');
 
+    const card = document.getElementById('auth-main-card');
+    const regTopBar = document.getElementById('reg-top-bar');
+
+    // Registration screens always use full-mode layout
+    if (card) card.className = 'auth-main-card full-mode';
+    if (regTopBar) regTopBar.classList.remove('hidden');
+
     // Update 5-Step Stepper
     let stepNum = 1;
-    if (screenId === 'screen-register') stepNum = 1;
+    if (screenId === 'view-register') stepNum = 1;
     else if (screenId === 'screen-email-otp') stepNum = 2;
     else if (screenId === 'screen-sms-otp') stepNum = 3;
     else if (screenId.startsWith('screen-mfa')) stepNum = 4;
@@ -142,11 +149,6 @@ class RegistrationFlow {
       this.startExpiryTimer('sms');
       this.startResendCooldown('sms');
       this.updateDevPanel();
-    } else if (screenId === 'screen-mfa-code') {
-      this.clearOtpInputs('mfa-otp-grid');
-      this.hideError('mfa');
-      this.startExpiryTimer('mfa');
-      this.updateDevPanel();
     } else if (screenId === 'screen-success') {
       this.stopTimers();
       this.clearDevPanel();
@@ -158,7 +160,7 @@ class RegistrationFlow {
     const countdownEl = document.getElementById(`${channel}-countdown`);
     if (!countdownEl) return;
 
-    let targetTime = this.state.expiresAt ? new Date(this.state.expiresAt).getTime() : Date.now() + (channel === 'mfa' ? 30 * 1000 : 5 * 60 * 1000);
+    let targetTime = this.state.expiresAt ? new Date(this.state.expiresAt).getTime() : Date.now() + 5 * 60 * 1000;
 
     const update = () => {
       const diff = targetTime - Date.now();
@@ -234,7 +236,6 @@ class RegistrationFlow {
       badge.className = channel === 'sms' ? 'round-icon-badge green-badge' : 'round-icon-badge blue-badge';
     }
 
-    // Reset verify and resend buttons
     const verifyBtn = document.getElementById(`btn-verify-${channel}`);
     const resendExpBtn = document.getElementById(`btn-resend-expired-${channel}`);
     if (verifyBtn) verifyBtn.classList.remove('hidden');

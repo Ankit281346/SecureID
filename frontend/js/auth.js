@@ -109,14 +109,7 @@ class AuthFlow {
     if (pwdInput) pwdInput.classList.add('input-error');
 
     if (badge) {
-      badge.innerHTML = `
-        <div class="round-badge red-badge">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-          </svg>
-        </div>
-      `;
+      badge.className = 'round-badge red-badge';
     }
   }
 
@@ -131,14 +124,7 @@ class AuthFlow {
     if (pwdInput) pwdInput.classList.remove('input-error');
 
     if (badge) {
-      badge.innerHTML = `
-        <div class="round-badge blue-badge">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-          </svg>
-        </div>
-      `;
+      badge.className = 'round-badge blue-badge';
     }
   }
 
@@ -147,25 +133,20 @@ class AuthFlow {
     const target = document.getElementById(viewId);
     if (target) target.classList.add('active');
 
-    // Stepper visibility: only show during registration
-    const stepper = document.getElementById('stepper');
-    if (stepper) {
-      if (viewId === 'view-register' || viewId.startsWith('screen-')) {
-        stepper.classList.remove('hidden');
-      } else {
-        stepper.classList.add('hidden');
-      }
-    }
-
-    // Hide sidebar on dashboard for full-width layout
-    const sidebar = document.getElementById('auth-sidebar');
     const card = document.getElementById('auth-main-card');
-    if (viewId === 'view-dashboard') {
-      if (sidebar) sidebar.style.display = 'none';
-      if (card) card.style.maxWidth = '920px';
+    const regTopBar = document.getElementById('reg-top-bar');
+
+    // Switch card modes cleanly
+    if (viewId === 'view-login' || viewId === 'view-login-mfa-choose' || viewId === 'view-login-mfa-otp') {
+      if (card) card.className = 'auth-main-card login-mode';
+      if (regTopBar) regTopBar.classList.add('hidden');
+    } else if (viewId === 'view-dashboard') {
+      if (card) card.className = 'auth-main-card dashboard-mode';
+      if (regTopBar) regTopBar.classList.add('hidden');
     } else {
-      if (sidebar) sidebar.style.display = '';
-      if (card) card.style.maxWidth = '';
+      // Registration screens
+      if (card) card.className = 'auth-main-card full-mode';
+      if (regTopBar) regTopBar.classList.remove('hidden');
     }
 
     if (viewId === 'view-login-mfa-otp') {
